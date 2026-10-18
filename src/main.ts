@@ -33,7 +33,7 @@ class MusicAssistant extends utils.Adapter {
     }
 
     private async onReady(): Promise<void> {
-        await this.setStateAsync('info.connection', false, true);
+        await this.setState('info.connection', false, true);
 
         const host = (this.config.host as string | undefined)?.trim();
         const port = Number(this.config.port) || 8095;
@@ -60,12 +60,12 @@ class MusicAssistant extends utils.Adapter {
 
         client.on('connected', () => {
             this.log.info('Connected to Music Assistant server');
-            void this.setStateAsync('info.connection', true, true);
+            void this.setState('info.connection', true, true);
             this.syncAll().catch((err: Error) => this.log.error(`Initial sync failed: ${err.message}`));
         });
         client.on('disconnected', () => {
             this.log.warn('Lost connection to Music Assistant server, will keep retrying');
-            void this.setStateAsync('info.connection', false, true);
+            void this.setState('info.connection', false, true);
         });
         client.on('error', (err: Error) => this.log.debug(`Music Assistant client error: ${err.message}`));
         client.on('event', (evt: MaEvent) => {
@@ -110,7 +110,7 @@ class MusicAssistant extends utils.Adapter {
                 const safeId = sanitizeId(evt.object_id);
                 const data = evt.data as { elapsed_time?: number } | undefined;
                 if (data && typeof data.elapsed_time === 'number' && this.queueIds.has(safeId)) {
-                    await this.setStateAsync(`queues.${safeId}.elapsedTime`, data.elapsed_time, true);
+                    await this.setState(`queues.${safeId}.elapsedTime`, data.elapsed_time, true);
                 }
                 break;
             }
@@ -186,21 +186,21 @@ class MusicAssistant extends utils.Adapter {
         await this.ensurePlayerObjects(safeId, player.name);
 
         const base = `players.${safeId}`;
-        await this.setStateAsync(`${base}.playerId`, player.player_id, true);
-        await this.setStateAsync(`${base}.name`, player.name, true);
-        await this.setStateAsync(`${base}.available`, !!player.available, true);
-        await this.setStateAsync(`${base}.powered`, !!player.powered, true);
-        await this.setStateAsync(`${base}.playbackState`, player.playback_state, true);
-        await this.setStateAsync(`${base}.volume`, player.volume_level ?? 0, true);
-        await this.setStateAsync(`${base}.muted`, !!player.volume_muted, true);
-        await this.setStateAsync(`${base}.activeSource`, player.active_source ?? '', true);
+        await this.setState(`${base}.playerId`, player.player_id, true);
+        await this.setState(`${base}.name`, player.name, true);
+        await this.setState(`${base}.available`, !!player.available, true);
+        await this.setState(`${base}.powered`, !!player.powered, true);
+        await this.setState(`${base}.playbackState`, player.playback_state, true);
+        await this.setState(`${base}.volume`, player.volume_level ?? 0, true);
+        await this.setState(`${base}.muted`, !!player.volume_muted, true);
+        await this.setState(`${base}.activeSource`, player.active_source ?? '', true);
 
         const media = player.current_media;
-        await this.setStateAsync(`${base}.mediaTitle`, media?.title ?? '', true);
-        await this.setStateAsync(`${base}.mediaArtist`, media?.artist ?? '', true);
-        await this.setStateAsync(`${base}.mediaAlbum`, media?.album ?? '', true);
-        await this.setStateAsync(`${base}.mediaImage`, media?.image_url ?? '', true);
-        await this.setStateAsync(`${base}.elapsedTime`, player.elapsed_time ?? media?.elapsed_time ?? 0, true);
+        await this.setState(`${base}.mediaTitle`, media?.title ?? '', true);
+        await this.setState(`${base}.mediaArtist`, media?.artist ?? '', true);
+        await this.setState(`${base}.mediaAlbum`, media?.album ?? '', true);
+        await this.setState(`${base}.mediaImage`, media?.image_url ?? '', true);
+        await this.setState(`${base}.elapsedTime`, player.elapsed_time ?? media?.elapsed_time ?? 0, true);
     }
 
     // ---------- Player queues ----------
@@ -271,14 +271,14 @@ class MusicAssistant extends utils.Adapter {
         await this.ensureQueueObjects(safeId, queue.display_name);
 
         const base = `queues.${safeId}`;
-        await this.setStateAsync(`${base}.queueId`, queue.queue_id, true);
-        await this.setStateAsync(`${base}.displayName`, queue.display_name, true);
-        await this.setStateAsync(`${base}.available`, !!queue.available, true);
-        await this.setStateAsync(`${base}.state`, queue.state, true);
-        await this.setStateAsync(`${base}.shuffleEnabled`, !!queue.shuffle_enabled, true);
-        await this.setStateAsync(`${base}.repeatMode`, queue.repeat_mode, true);
-        await this.setStateAsync(`${base}.elapsedTime`, queue.elapsed_time ?? 0, true);
-        await this.setStateAsync(`${base}.currentItemName`, queue.current_item?.name ?? '', true);
+        await this.setState(`${base}.queueId`, queue.queue_id, true);
+        await this.setState(`${base}.displayName`, queue.display_name, true);
+        await this.setState(`${base}.available`, !!queue.available, true);
+        await this.setState(`${base}.state`, queue.state, true);
+        await this.setState(`${base}.shuffleEnabled`, !!queue.shuffle_enabled, true);
+        await this.setState(`${base}.repeatMode`, queue.repeat_mode, true);
+        await this.setState(`${base}.elapsedTime`, queue.elapsed_time ?? 0, true);
+        await this.setState(`${base}.currentItemName`, queue.current_item?.name ?? '', true);
     }
 
     // ---------- Command dispatch ----------
@@ -297,7 +297,7 @@ class MusicAssistant extends utils.Adapter {
             } else if (parts[0] === 'queues' && parts.length >= 3) {
                 await this.handleQueueCommand(parts[1], parts.slice(2), state);
             }
-            await this.setStateAsync(id, state.val, true);
+            await this.setState(id, state.val, true);
         } catch (err) {
             this.log.error(`Command for ${id} failed: ${(err as Error).message}`);
         }
