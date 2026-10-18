@@ -59,6 +59,7 @@
         "platform": "Javascript/Node.js",
         "icon": "music-assistant.png",
         "enabled": true,
+        "nogit": true,
         "extIcon": "https://raw.githubusercontent.com/NurPech/ioBroker.music-assistant/main/admin/music-assistant.png",
         "readme": "https://github.com/NurPech/ioBroker.music-assistant/blob/main/README.md",
         "loglevel": "info",
@@ -87,6 +88,12 @@
         "port": 8095,
         "token": ""
     },
+    "encryptedNative": [
+        "token"
+    ],
+    "protectedNative": [
+        "token"
+    ],
     "objects": [],
     "instanceObjects": [
         {
