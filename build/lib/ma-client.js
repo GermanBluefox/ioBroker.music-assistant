@@ -47,17 +47,19 @@ const RECONNECT_DELAY_MS = 5e3;
 class MaClient extends import_node_events.EventEmitter {
   url;
   token;
+  scheduler;
   ws = null;
   pending = /* @__PURE__ */ new Map();
   partialResults = /* @__PURE__ */ new Map();
   msgIdCounter = 0;
-  reconnectTimer = null;
+  reconnectTimer = void 0;
   closing = false;
   authenticated = false;
-  constructor(host, port, token) {
+  constructor(host, port, token, scheduler) {
     super();
     this.url = `ws://${host}:${port}/ws`;
     this.token = token;
+    this.scheduler = scheduler;
   }
   /** Connect and authenticate. Resolves once the connection is usable. */
   connect() {
@@ -69,7 +71,7 @@ class MaClient extends import_node_events.EventEmitter {
       let settled = false;
       const ws = new import_ws.default(this.url);
       this.ws = ws;
-      const authTimeout = setTimeout(() => {
+      const authTimeout = this.scheduler.setTimeout(() => {
         if (!settled) {
           settled = true;
           ws.terminate();
@@ -90,14 +92,14 @@ class MaClient extends import_node_events.EventEmitter {
           this.emit("serverInfo", msg);
           this.authCommand().then(() => {
             this.authenticated = true;
-            clearTimeout(authTimeout);
+            this.scheduler.clearTimeout(authTimeout);
             if (!settled) {
               settled = true;
               resolve();
             }
             this.emit("connected");
           }).catch((err) => {
-            clearTimeout(authTimeout);
+            this.scheduler.clearTimeout(authTimeout);
             if (!settled) {
               settled = true;
               reject(err);
@@ -114,7 +116,7 @@ class MaClient extends import_node_events.EventEmitter {
         }
       });
       ws.on("close", () => {
-        clearTimeout(authTimeout);
+        this.scheduler.clearTimeout(authTimeout);
         const wasAuthenticated = this.authenticated;
         this.authenticated = false;
         this.failPending(new Error("Connection to Music Assistant server closed"));
@@ -130,7 +132,7 @@ class MaClient extends import_node_events.EventEmitter {
         }
       });
       ws.on("error", (err) => {
-        clearTimeout(authTimeout);
+        this.scheduler.clearTimeout(authTimeout);
         if (!settled) {
           settled = true;
           reject(err);
@@ -143,8 +145,8 @@ class MaClient extends import_node_events.EventEmitter {
     if (this.reconnectTimer) {
       return;
     }
-    this.reconnectTimer = setTimeout(() => {
-      this.reconnectTimer = null;
+    this.reconnectTimer = this.scheduler.setTimeout(() => {
+      this.reconnectTimer = void 0;
       if (this.closing) {
         return;
       }
@@ -217,8 +219,8 @@ class MaClient extends import_node_events.EventEmitter {
     var _a, _b;
     this.closing = true;
     if (this.reconnectTimer) {
-      clearTimeout(this.reconnectTimer);
-      this.reconnectTimer = null;
+      this.scheduler.clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = void 0;
     }
     this.authenticated = false;
     this.failPending(new Error("Client closed"));

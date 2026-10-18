@@ -52,7 +52,10 @@ class MusicAssistant extends utils.Adapter {
         this.subscribeStates('queues.*.shuffleEnabled');
         this.subscribeStates('queues.*.repeatMode');
 
-        const client = new MaClient(host, port, token);
+        const client = new MaClient(host, port, token, {
+            setTimeout: (cb, ms) => this.setTimeout(cb, ms),
+            clearTimeout: timer => this.clearTimeout(timer),
+        });
         this.client = client;
 
         client.on('connected', () => {

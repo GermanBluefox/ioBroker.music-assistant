@@ -10,7 +10,7 @@
   "homepage": "https://github.com/NurPech/ioBroker.music-assistant",
   "license": "MIT",
   "keywords": [
-    "iobroker",
+    "ioBroker",
     "music-assistant",
     "music",
     "player",
@@ -21,7 +21,7 @@
     "url": "https://github.com/NurPech/ioBroker.music-assistant.git"
   },
   "engines": {
-    "node": ">= 20"
+    "node": ">=22"
   },
   "dependencies": {
     "@iobroker/adapter-core": "^3.4.3",
@@ -36,9 +36,9 @@
     "@iobroker/dev-server": "^0.8.0",
     "@iobroker/eslint-config": "^2.3.4",
     "@iobroker/testing": "^6.3.1",
-    "@tsconfig/node20": "^20.1.10",
+    "@tsconfig/node22": "^22.0.2",
     "@types/iobroker": "npm:@iobroker/types@^7.2.5",
-    "@types/node": "^20.19.43",
+    "@types/node": "^22.18.10",
     "@types/ws": "^8.18.1",
     "rimraf": "^6.1.3",
     "source-map-support": "^0.5.21",

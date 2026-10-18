@@ -38,6 +38,12 @@ function isResult(msg: IncomingMessage): msg is ResultMessage {
 const AUTH_TIMEOUT_MS = 15000;
 const RECONNECT_DELAY_MS = 5000;
 
+/** Timer scheduling, routed through the adapter so pending timers get cleared automatically on unload. */
+export interface MaClientScheduler {
+    setTimeout: (callback: () => void, ms: number) => ioBroker.Timeout | undefined;
+    clearTimeout: (timer: ioBroker.Timeout | undefined) => void;
+}
+
 /**
  * Minimal WebSocket client for the Music Assistant server API.
  * Connects to <host>:<port>/ws, authenticates with a long-lived token and
@@ -46,18 +52,20 @@ const RECONNECT_DELAY_MS = 5000;
 export class MaClient extends EventEmitter {
     private readonly url: string;
     private readonly token: string;
+    private readonly scheduler: MaClientScheduler;
     private ws: WebSocket | null = null;
     private pending = new Map<string, { resolve: (v: unknown) => void; reject: (e: Error) => void }>();
     private partialResults = new Map<string, unknown[]>();
     private msgIdCounter = 0;
-    private reconnectTimer: NodeJS.Timeout | null = null;
+    private reconnectTimer: ioBroker.Timeout | undefined = undefined;
     private closing = false;
     private authenticated = false;
 
-    public constructor(host: string, port: number, token: string) {
+    public constructor(host: string, port: number, token: string, scheduler: MaClientScheduler) {
         super();
         this.url = `ws://${host}:${port}/ws`;
         this.token = token;
+        this.scheduler = scheduler;
     }
 
     /** Connect and authenticate. Resolves once the connection is usable. */
@@ -72,7 +80,7 @@ export class MaClient extends EventEmitter {
             const ws = new WebSocket(this.url);
             this.ws = ws;
 
-            const authTimeout = setTimeout(() => {
+            const authTimeout = this.scheduler.setTimeout(() => {
                 if (!settled) {
                     settled = true;
                     ws.terminate();
@@ -102,7 +110,7 @@ export class MaClient extends EventEmitter {
                     this.authCommand()
                         .then(() => {
                             this.authenticated = true;
-                            clearTimeout(authTimeout);
+                            this.scheduler.clearTimeout(authTimeout);
                             if (!settled) {
                                 settled = true;
                                 resolve();
@@ -110,7 +118,7 @@ export class MaClient extends EventEmitter {
                             this.emit('connected');
                         })
                         .catch((err: Error) => {
-                            clearTimeout(authTimeout);
+                            this.scheduler.clearTimeout(authTimeout);
                             if (!settled) {
                                 settled = true;
                                 reject(err);
@@ -130,7 +138,7 @@ export class MaClient extends EventEmitter {
             });
 
             ws.on('close', () => {
-                clearTimeout(authTimeout);
+                this.scheduler.clearTimeout(authTimeout);
                 const wasAuthenticated = this.authenticated;
                 this.authenticated = false;
                 this.failPending(new Error('Connection to Music Assistant server closed'));
@@ -147,7 +155,7 @@ export class MaClient extends EventEmitter {
             });
 
             ws.on('error', (err: Error) => {
-                clearTimeout(authTimeout);
+                this.scheduler.clearTimeout(authTimeout);
                 if (!settled) {
                     settled = true;
                     reject(err);
@@ -161,8 +169,8 @@ export class MaClient extends EventEmitter {
         if (this.reconnectTimer) {
             return;
         }
-        this.reconnectTimer = setTimeout(() => {
-            this.reconnectTimer = null;
+        this.reconnectTimer = this.scheduler.setTimeout(() => {
+            this.reconnectTimer = undefined;
             if (this.closing) {
                 return;
             }
@@ -244,8 +252,8 @@ export class MaClient extends EventEmitter {
     public close(): void {
         this.closing = true;
         if (this.reconnectTimer) {
-            clearTimeout(this.reconnectTimer);
-            this.reconnectTimer = null;
+            this.scheduler.clearTimeout(this.reconnectTimer);
+            this.reconnectTimer = undefined;
         }
         this.authenticated = false;
         this.failPending(new Error('Client closed'));
