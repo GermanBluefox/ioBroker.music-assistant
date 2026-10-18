@@ -14,6 +14,10 @@
 
 Control Music Assistant players and queues from ioBroker
 
+> **Disclaimer:** This is an unofficial, community-made adapter. It is not affiliated with,
+> endorsed by, or supported by the Music Assistant project or the Open Home Foundation.
+> "Music Assistant" and its logo are property of their respective owners.
+
 ## Developer manual
 This section is intended for the developer. It can be deleted later.
 
