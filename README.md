@@ -125,6 +125,8 @@ Please refer to the [`dev-server` documentation](https://github.com/ioBroker/dev
 ### 0.0.1 (2026-10-18)
 * (M1kad0) initial release
 
+[Older changelogs can be found there](CHANGELOG_OLD.md)
+
 ## License
 MIT License
 
