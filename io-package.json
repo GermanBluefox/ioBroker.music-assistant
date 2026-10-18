@@ -1,121 +1,134 @@
 {
-    "common": {
-        "name": "music-assistant",
-        "version": "0.0.1",
-        "news": {
-            "0.0.1": {
-                "en": "initial release",
-                "de": "Erstveröffentlichung",
-                "ru": "Начальная версия",
-                "pt": "lançamento inicial",
-                "nl": "Eerste uitgave",
-                "fr": "Première version",
-                "it": "Versione iniziale",
-                "es": "Versión inicial",
-                "pl": "Pierwsze wydanie",
-                "uk": "Початкова версія",
-                "zh-cn": "首次出版"
-            }
-        },
-        "titleLang": {
-            "en": "Music Assistant",
-            "de": "Musikassistent",
-            "ru": "Музыкальный помощник",
-            "pt": "Assistente de música",
-            "nl": "Muziek Assistent",
-            "fr": "Assistante musicale",
-            "it": "Assistente musicale",
-            "es": "Asistente de música",
-            "pl": "Asystent muzyczny",
-            "uk": "Музичний помічник",
-            "zh-cn": "音乐助理"
-        },
-        "desc": {
-            "en": "Control Music Assistant players and queues from ioBroker",
-            "de": "Steuern Sie Music Assistant-Player und Warteschlangen über ioBroker",
-            "ru": "Управляйте игроками и очередями Music Assistant из ioBroker",
-            "pt": "Controle jogadores e filas do Music Assistant do ioBroker",
-            "nl": "Beheer Music Assistant-spelers en wachtrijen vanuit ioBroker",
-            "fr": "Contrôlez les lecteurs et les files d'attente de Music Assistant depuis ioBroker",
-            "it": "Controlla i lettori e le code di Music Assistant da ioBroker",
-            "es": "Controle los reproductores y colas de Music Assistant desde ioBroker",
-            "pl": "Kontroluj odtwarzacze i kolejki Music Assistant za pomocą ioBroker",
-            "uk": "Керуйте програвачами та чергами Music Assistant з ioBroker",
-            "zh-cn": "从 ioBroker 控制音乐助手播放器和队列"
-        },
-        "authors": [
-            "M1kad0 <leonie+iobroker@sgessinger.de>"
-        ],
-        "keywords": [
-            "music-assistant",
-            "music",
-            "player",
-            "multimedia"
-        ],
-        "licenseInformation": {
-            "type": "free",
-            "license": "MIT"
-        },
-        "platform": "Javascript/Node.js",
-        "icon": "music-assistant.png",
-        "enabled": true,
-        "nogit": true,
-        "extIcon": "https://raw.githubusercontent.com/NurPech/ioBroker.music-assistant/main/admin/music-assistant.png",
-        "readme": "https://github.com/NurPech/ioBroker.music-assistant/blob/main/README.md",
-        "loglevel": "info",
-        "tier": 3,
-        "mode": "daemon",
-        "type": "multimedia",
-        "compact": true,
-        "connectionType": "local",
-        "dataSource": "push",
-        "adminUI": {
-            "config": "json"
-        },
-        "dependencies": [
-            {
-                "js-controller": ">=6.0.11"
-            }
-        ],
-        "globalDependencies": [
-            {
-                "admin": ">=7.6.20"
-            }
-        ]
+  "common": {
+    "name": "music-assistant",
+    "version": "0.0.2",
+    "news": {
+      "0.0.2": {
+        "en": "republish to fix the npm release",
+        "de": "republish to fix the npm release",
+        "ru": "переопубликуйте, чтобы исправить выпуск npm",
+        "pt": "republicar e corrigir o npm",
+        "nl": "opnieuw publiceren om de npm-release te repareren",
+        "fr": "republier pour corriger la version NPM",
+        "it": "ripubblica per correggere npm",
+        "es": "volver a publicar para arreglar npm",
+        "pl": "opublikuj ponownie, aby naprawić wydanie npm",
+        "uk": "повторно опублікувати, щоб виправити випуск npm",
+        "zh-cn": "重新发布以修复 npm 版本"
+      },
+      "0.0.1": {
+        "en": "initial release",
+        "de": "Erstveröffentlichung",
+        "ru": "Начальная версия",
+        "pt": "lançamento inicial",
+        "nl": "Eerste uitgave",
+        "fr": "Première version",
+        "it": "Versione iniziale",
+        "es": "Versión inicial",
+        "pl": "Pierwsze wydanie",
+        "uk": "Початкова версія",
+        "zh-cn": "首次出版"
+      }
     },
-    "native": {
-        "host": "",
-        "port": 8095,
-        "token": ""
+    "titleLang": {
+      "en": "Music Assistant",
+      "de": "Musikassistent",
+      "ru": "Музыкальный помощник",
+      "pt": "Assistente de música",
+      "nl": "Muziek Assistent",
+      "fr": "Assistante musicale",
+      "it": "Assistente musicale",
+      "es": "Asistente de música",
+      "pl": "Asystent muzyczny",
+      "uk": "Музичний помічник",
+      "zh-cn": "音乐助理"
     },
-    "encryptedNative": [
-        "token"
+    "desc": {
+      "en": "Control Music Assistant players and queues from ioBroker",
+      "de": "Steuern Sie Music Assistant-Player und Warteschlangen über ioBroker",
+      "ru": "Управляйте игроками и очередями Music Assistant из ioBroker",
+      "pt": "Controle jogadores e filas do Music Assistant do ioBroker",
+      "nl": "Beheer Music Assistant-spelers en wachtrijen vanuit ioBroker",
+      "fr": "Contrôlez les lecteurs et les files d'attente de Music Assistant depuis ioBroker",
+      "it": "Controlla i lettori e le code di Music Assistant da ioBroker",
+      "es": "Controle los reproductores y colas de Music Assistant desde ioBroker",
+      "pl": "Kontroluj odtwarzacze i kolejki Music Assistant za pomocą ioBroker",
+      "uk": "Керуйте програвачами та чергами Music Assistant з ioBroker",
+      "zh-cn": "从 ioBroker 控制音乐助手播放器和队列"
+    },
+    "authors": [
+      "M1kad0 <leonie+iobroker@sgessinger.de>"
     ],
-    "protectedNative": [
-        "token"
+    "keywords": [
+      "music-assistant",
+      "music",
+      "player",
+      "multimedia"
     ],
-    "objects": [],
-    "instanceObjects": [
-        {
-            "_id": "info",
-            "type": "channel",
-            "common": {
-                "name": "Information"
-            },
-            "native": {}
-        },
-        {
-            "_id": "info.connection",
-            "type": "state",
-            "common": {
-                "role": "indicator.connected",
-                "name": "Device or service connected",
-                "type": "boolean",
-                "read": true,
-                "write": false,
-                "def": false
-            },
-            "native": {}
-        }
+    "licenseInformation": {
+      "type": "free",
+      "license": "MIT"
+    },
+    "platform": "Javascript/Node.js",
+    "icon": "music-assistant.png",
+    "enabled": true,
+    "nogit": true,
+    "extIcon": "https://raw.githubusercontent.com/NurPech/ioBroker.music-assistant/main/admin/music-assistant.png",
+    "readme": "https://github.com/NurPech/ioBroker.music-assistant/blob/main/README.md",
+    "loglevel": "info",
+    "tier": 3,
+    "mode": "daemon",
+    "type": "multimedia",
+    "compact": true,
+    "connectionType": "local",
+    "dataSource": "push",
+    "adminUI": {
+      "config": "json"
+    },
+    "dependencies": [
+      {
+        "js-controller": ">=6.0.11"
+      }
+    ],
+    "globalDependencies": [
+      {
+        "admin": ">=7.6.20"
+      }
     ]
+  },
+  "native": {
+    "host": "",
+    "port": 8095,
+    "token": ""
+  },
+  "encryptedNative": [
+    "token"
+  ],
+  "protectedNative": [
+    "token"
+  ],
+  "objects": [],
+  "instanceObjects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.connection",
+      "type": "state",
+      "common": {
+        "role": "indicator.connected",
+        "name": "Device or service connected",
+        "type": "boolean",
+        "read": true,
+        "write": false,
+        "def": false
+      },
+      "native": {}
+    }
+  ]
 }

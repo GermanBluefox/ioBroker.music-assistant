@@ -1,6 +1,6 @@
 {
   "name": "iobroker.music-assistant",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Control Music Assistant players and queues from ioBroker",
   "author": {
     "name": "M1kad0",

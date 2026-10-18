@@ -71,8 +71,7 @@ start/stop the instance manually from the Admin UI instead.
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-
-### **WORK IN PROGRESS**
+### 0.0.2 (2026-10-18)
 * (M1kad0) republish to fix the npm release
 
 ### 0.0.1 (2026-10-18)
