@@ -72,6 +72,9 @@ start/stop the instance manually from the Admin UI instead.
     ### **WORK IN PROGRESS**
 -->
 
+### **WORK IN PROGRESS**
+* (M1kad0) republish to fix the npm release
+
 ### 0.0.1 (2026-10-18)
 * (M1kad0) initial release
 
