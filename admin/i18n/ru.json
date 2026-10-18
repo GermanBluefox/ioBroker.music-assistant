@@ -1,0 +1,7 @@
+{
+    "API token": "API-токен",
+    "Long-lived token from Settings → Profile on the Music Assistant server": "Долговечный токен из «Настройки» → «Профиль» на сервере Music Assistant.",
+    "Music Assistant server host/IP": "Хост/IP-адрес сервера Music Assistant",
+    "Port": "Порт",
+    "music-assistant adapter settings": "Настройки адаптера для music-assistant"
+}

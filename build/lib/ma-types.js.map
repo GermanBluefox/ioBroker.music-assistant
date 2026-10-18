@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/lib/ma-types.ts"],
+  "sourcesContent": ["export interface PlayerMedia {\n    uri?: string;\n    title?: string;\n    artist?: string;\n    album?: string;\n    image_url?: string;\n    duration?: number;\n    elapsed_time?: number;\n}\n\nexport interface Player {\n    player_id: string;\n    name: string;\n    available: boolean;\n    powered: boolean | null;\n    playback_state: 'idle' | 'paused' | 'playing' | 'unknown';\n    elapsed_time: number | null;\n    volume_level: number | null;\n    volume_muted: boolean | null;\n    active_source: string | null;\n    source_list?: string[];\n    current_media: PlayerMedia | null;\n    synced_to?: string | null;\n    group_members?: string[];\n}\n\nexport interface QueueItemMediaItem {\n    name?: string;\n    metadata?: {\n        image?: {\n            path?: string;\n        } | null;\n    };\n}\n\nexport interface QueueItem {\n    queue_item_id: string;\n    name: string;\n    duration: number | null;\n    media_item?: QueueItemMediaItem | null;\n}\n\nexport interface PlayerQueue {\n    queue_id: string;\n    display_name: string;\n    available: boolean;\n    active: boolean;\n    shuffle_enabled: boolean;\n    repeat_mode: 'off' | 'one' | 'all' | 'unknown';\n    crossfade_enabled: boolean;\n    elapsed_time: number | null;\n    state: 'idle' | 'paused' | 'playing' | 'unknown';\n    current_item: QueueItem | null;\n}\n"],
+  "mappings": ";;;;;;;;;;;;;;AAAA;AAAA;",
+  "names": []
+}

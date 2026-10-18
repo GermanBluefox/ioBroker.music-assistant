@@ -1,0 +1,46 @@
+{
+    "cli": true,
+    "target": "directory",
+    "adapterName": "music-assistant",
+    "title": "Music Assistant",
+    "description": "Control Music Assistant players and queues from ioBroker",
+    "keywords": [
+        "iobroker",
+        "music-assistant",
+        "music",
+        "player",
+        "multimedia"
+    ],
+    "expert": "no",
+    "features": [
+        "adapter"
+    ],
+    "adminFeatures": [],
+    "type": "multimedia",
+    "startMode": "daemon",
+    "connectionType": "local",
+    "dataSource": "push",
+    "connectionIndicator": "yes",
+    "language": "TypeScript",
+    "nodeVersion": "20",
+    "adminUi": "json",
+    "tools": [
+        "ESLint"
+    ],
+    "eslintConfig": "official",
+    "releaseScript": "yes",
+    "devServer": "local",
+    "devServerPort": 8082,
+    "indentation": "Space (4)",
+    "quotes": "single",
+    "authorName": "M1kad0",
+    "authorGithub": "NurPech",
+    "authorEmail": "leonie+iobroker@sgessinger.de",
+    "gitRemoteProtocol": "HTTPS",
+    "gitCommit": "no",
+    "defaultBranch": "main",
+    "license": "MIT License",
+    "dependabot": "yes",
+    "replay": "C:\\Users\\rene\\AppData\\Local\\Temp\\claude\\C--Users-rene-git-AdvancedMacros\\1f837b1c-9af8-4900-9cbb-93e631afd99a\\scratchpad\\ma-create-adapter.json",
+    "creatorVersion": "3.1.5"
+}
