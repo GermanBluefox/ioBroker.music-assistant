@@ -1,0 +1,22 @@
+version: '3.9'
+
+services:
+    music-assistant:
+        image: ghcr.io/music-assistant/server:latest
+        labels:
+            - 'iobEnabled=${config.dockerMusicAssistant.enabled:-false}'
+            - 'iobStopOnUnload=${config.dockerMusicAssistant.stopIfInstanceStopped:-false}'
+            - 'iobAutoImageUpdate=${config.dockerMusicAssistant.autoImageUpdate:-true}'
+            - 'iobBackup=ma_data'
+        # `true` selects the default name of the instance: iob_music_assistant_<instance>
+        container_name: true
+        # Music Assistant discovers the players (Sonos, Chromecast, AirPlay, DLNA, ...) via mDNS/SSDP
+        # and the players fetch the audio stream from it, so it has to live in the network of the host.
+        # The web interface and the API are reachable on port 8095 of the host then.
+        network_mode: host
+        volumes:
+            - ma_data:/data
+        restart: unless-stopped
+
+volumes:
+    ma_data:

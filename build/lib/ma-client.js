@@ -28,7 +28,9 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var ma_client_exports = {};
 __export(ma_client_exports, {
-  MaClient: () => MaClient
+  MaAuthError: () => MaAuthError,
+  MaClient: () => MaClient,
+  MaCommandError: () => MaCommandError
 });
 module.exports = __toCommonJS(ma_client_exports);
 var import_node_events = require("node:events");
@@ -44,10 +46,27 @@ function isResult(msg) {
 }
 const AUTH_TIMEOUT_MS = 15e3;
 const RECONNECT_DELAY_MS = 5e3;
+const DEVICE_NAME = "ioBroker.music-assistant";
+class MaCommandError extends Error {
+  /**
+   * @param message the details the server sent
+   * @param code the error code of the server
+   */
+  constructor(message, code) {
+    super(message);
+    this.code = code;
+  }
+}
+class MaAuthError extends Error {
+}
 class MaClient extends import_node_events.EventEmitter {
   url;
-  token;
+  httpUrl;
+  auth;
   scheduler;
+  /** The configured token or the session token of the last login, reused on every reconnect */
+  accessToken;
+  setupDone = false;
   ws = null;
   pending = /* @__PURE__ */ new Map();
   partialResults = /* @__PURE__ */ new Map();
@@ -55,10 +74,12 @@ class MaClient extends import_node_events.EventEmitter {
   reconnectTimer = void 0;
   closing = false;
   authenticated = false;
-  constructor(host, port, token, scheduler) {
+  constructor(host, port, auth, scheduler) {
     super();
     this.url = `ws://${host}:${port}/ws`;
-    this.token = token;
+    this.httpUrl = `http://${host}:${port}`;
+    this.auth = auth;
+    this.accessToken = auth.token || void 0;
     this.scheduler = scheduler;
   }
   /** Connect and authenticate. Resolves once the connection is usable. */
@@ -66,7 +87,102 @@ class MaClient extends import_node_events.EventEmitter {
     this.closing = false;
     return this.connectOnce();
   }
-  connectOnce() {
+  async connectOnce() {
+    if (this.auth.setupIfNeeded && !this.setupDone) {
+      try {
+        await this.runFirstTimeSetup();
+      } catch (err) {
+        if (err instanceof MaAuthError) {
+          this.failAuth(err);
+        } else {
+          this.scheduleReconnect();
+        }
+        throw err;
+      }
+    }
+    return this.openSocket();
+  }
+  /**
+   * Creates the first admin user of a fresh server with the configured credentials. A server that
+   * already has a user answers with 409, then the normal login follows.
+   */
+  async runFirstTimeSetup() {
+    const { username, password } = this.auth;
+    if (!username || !password) {
+      throw new MaAuthError("Username and password are required to set up Music Assistant");
+    }
+    const res = await fetch(`${this.httpUrl}/setup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password, device_name: DEVICE_NAME }),
+      signal: AbortSignal.timeout(AUTH_TIMEOUT_MS)
+    });
+    if (res.status === 409) {
+      this.setupDone = true;
+      return;
+    }
+    const body = await res.json().catch(() => null);
+    if (res.ok && (body == null ? void 0 : body.success) && body.token) {
+      this.setupDone = true;
+      this.accessToken = body.token;
+      this.emit("setupDone", username);
+      return;
+    }
+    const reason = (body == null ? void 0 : body.error) || `HTTP ${res.status}`;
+    if (res.status === 400) {
+      throw new MaAuthError(`Cannot set up Music Assistant: ${reason}`);
+    }
+    throw new Error(`Cannot set up Music Assistant: ${reason}`);
+  }
+  /** Signs in with the token if there is one, otherwise (or if it expired) with username/password */
+  async authenticate() {
+    const { username, password } = this.auth;
+    if (this.accessToken) {
+      try {
+        await this.sendCommand("auth", { token: this.accessToken, device_name: DEVICE_NAME });
+        return;
+      } catch (err) {
+        if (!(err instanceof MaCommandError)) {
+          throw err;
+        }
+        if (!username || !password) {
+          throw new MaAuthError(`Music Assistant rejected the token: ${err.message}`);
+        }
+        this.accessToken = void 0;
+      }
+    }
+    if (!username || !password) {
+      throw new MaAuthError("Neither a token nor username and password are configured");
+    }
+    const result = await this.sendCommand("auth/login", {
+      username,
+      password,
+      device_name: DEVICE_NAME
+    });
+    if (!(result == null ? void 0 : result.success) || !result.access_token) {
+      throw new MaAuthError(
+        `Login to Music Assistant as "${username}" failed: ${(result == null ? void 0 : result.error) || "unknown error"}`
+      );
+    }
+    this.accessToken = result.access_token;
+    await this.sendCommand("auth", { token: this.accessToken, device_name: DEVICE_NAME });
+  }
+  /**
+   * Stops the client for good after the server refused the credentials
+   *
+   * @param err why the credentials were refused
+   */
+  failAuth(err) {
+    var _a;
+    this.closing = true;
+    if (this.reconnectTimer) {
+      this.scheduler.clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = void 0;
+    }
+    (_a = this.ws) == null ? void 0 : _a.close();
+    this.emit("authFailed", err);
+  }
+  openSocket() {
     return new Promise((resolve, reject) => {
       let settled = false;
       const ws = new import_ws.default(this.url);
@@ -90,7 +206,7 @@ class MaClient extends import_node_events.EventEmitter {
         }
         if (isServerInfo(msg)) {
           this.emit("serverInfo", msg);
-          this.authCommand().then(() => {
+          this.authenticate().then(() => {
             this.authenticated = true;
             this.scheduler.clearTimeout(authTimeout);
             if (!settled) {
@@ -103,6 +219,9 @@ class MaClient extends import_node_events.EventEmitter {
             if (!settled) {
               settled = true;
               reject(err);
+            }
+            if (err instanceof MaAuthError) {
+              this.failAuth(err);
             }
           });
           return;
@@ -142,7 +261,7 @@ class MaClient extends import_node_events.EventEmitter {
     });
   }
   scheduleReconnect() {
-    if (this.reconnectTimer) {
+    if (this.reconnectTimer || this.closing) {
       return;
     }
     this.reconnectTimer = this.scheduler.setTimeout(() => {
@@ -154,9 +273,6 @@ class MaClient extends import_node_events.EventEmitter {
         this.scheduleReconnect();
       });
     }, RECONNECT_DELAY_MS);
-  }
-  authCommand() {
-    return this.sendCommand("auth", { token: this.token, device_name: "ioBroker.music-assistant" });
   }
   nextMessageId() {
     this.msgIdCounter += 1;
@@ -181,7 +297,7 @@ class MaClient extends import_node_events.EventEmitter {
     }
     this.pending.delete(msg.message_id);
     if (msg.error_code) {
-      pending.reject(new Error(msg.details || msg.error_code));
+      pending.reject(new MaCommandError(msg.details || String(msg.error_code), String(msg.error_code)));
     } else {
       pending.resolve(msg.result);
     }
@@ -231,6 +347,8 @@ class MaClient extends import_node_events.EventEmitter {
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  MaClient
+  MaAuthError,
+  MaClient,
+  MaCommandError
 });
 //# sourceMappingURL=ma-client.js.map

@@ -1,7 +1,17 @@
 {
     "API token": "Маркер API",
+    "At least 8 characters": "Щонайменше 8 символів",
+    "Auto-update Docker image": "Автоматично оновлювати образ Docker",
+    "credentials_info": "Замість токена адаптер може входити з іменем користувача та паролем користувача Music Assistant. Спочатку використовується токен.",
+    "docker_credentials_info": "Під час першого запуску адаптер створює цього користувача як адміністратора в Music Assistant і входить під ним. Увійдіть з тими самими даними на http://<ioBroker-host>:8095 (або через плитку «Music Assistant» на вступній сторінці), щоб завершити налаштування. Пізніша зміна тут не змінює користувача в Music Assistant.",
+    "docker_explanation": "ioBroker запускає сервер Music Assistant у Docker-контейнері на цьому хості та керує ним. Docker має бути встановлений.",
+    "If enabled, the latest Docker image will be pulled when the adapter starts.": "Якщо ввімкнено, під час запуску адаптера буде завантажено найновіший образ Docker.",
     "Long-lived token from Settings → Profile on the Music Assistant server": "Довговічний маркер із Налаштувань → Профіль на сервері Music Assistant",
     "Music Assistant server host/IP": "Хост/IP сервера Music Assistant",
+    "music-assistant adapter settings": "Налаштування адаптера для music-assistant",
+    "Password": "Пароль",
     "Port": "Порт",
-    "music-assistant adapter settings": "Налаштування адаптера для music-assistant"
+    "Run Music Assistant in Docker": "Запустити Music Assistant у Docker",
+    "Stop container when instance stops": "Зупиняти контейнер під час зупинки екземпляра",
+    "Username": "Ім’я користувача"
 }

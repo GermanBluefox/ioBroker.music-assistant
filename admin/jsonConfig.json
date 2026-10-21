@@ -2,9 +2,17 @@
     "i18n": true,
     "type": "panel",
     "items": {
+        "dockerMusicAssistant.enabled": {
+            "type": "checkDocker",
+            "label": "Run Music Assistant in Docker",
+            "help": "docker_explanation",
+            "newLine": true,
+            "xs": 12
+        },
         "host": {
             "type": "text",
             "label": "Music Assistant server host/IP",
+            "hidden": "!!data.dockerMusicAssistant?.enabled",
             "newLine": true,
             "xs": 12,
             "sm": 12,
@@ -18,6 +26,7 @@
             "default": 8095,
             "min": 1,
             "max": 65535,
+            "hidden": "!!data.dockerMusicAssistant?.enabled",
             "newLine": true,
             "xs": 12,
             "sm": 12,
@@ -29,12 +38,68 @@
             "type": "password",
             "label": "API token",
             "help": "Long-lived token from Settings → Profile on the Music Assistant server",
+            "hidden": "!!data.dockerMusicAssistant?.enabled",
             "newLine": true,
             "xs": 12,
             "sm": 12,
             "md": 6,
             "lg": 4,
             "xl": 4
+        },
+        "_credentialsInfo": {
+            "type": "staticText",
+            "text": "credentials_info",
+            "hidden": "!!data.dockerMusicAssistant?.enabled",
+            "newLine": true,
+            "xs": 12
+        },
+        "_dockerCredentialsInfo": {
+            "type": "staticText",
+            "text": "docker_credentials_info",
+            "hidden": "!data.dockerMusicAssistant?.enabled",
+            "newLine": true,
+            "xs": 12
+        },
+        "username": {
+            "type": "text",
+            "label": "Username",
+            "newLine": true,
+            "xs": 12,
+            "sm": 12,
+            "md": 6,
+            "lg": 4,
+            "xl": 4
+        },
+        "password": {
+            "type": "password",
+            "label": "Password",
+            "visible": true,
+            "validator": "!data.dockerMusicAssistant?.enabled || (data.password || '').length >= 8",
+            "validatorErrorText": "At least 8 characters",
+            "validatorNoSaveOnError": true,
+            "xs": 12,
+            "sm": 12,
+            "md": 6,
+            "lg": 4,
+            "xl": 4
+        },
+        "dockerMusicAssistant.stopIfInstanceStopped": {
+            "type": "checkbox",
+            "label": "Stop container when instance stops",
+            "hidden": "!data.dockerMusicAssistant?.enabled",
+            "newLine": true,
+            "xs": 12,
+            "sm": 12,
+            "md": 6
+        },
+        "dockerMusicAssistant.autoImageUpdate": {
+            "type": "checkbox",
+            "label": "Auto-update Docker image",
+            "help": "If enabled, the latest Docker image will be pulled when the adapter starts.",
+            "hidden": "!data.dockerMusicAssistant?.enabled",
+            "xs": 12,
+            "sm": 12,
+            "md": 6
         }
     }
 }

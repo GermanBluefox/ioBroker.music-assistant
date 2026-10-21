@@ -40,6 +40,27 @@ export interface QueueItem {
     media_item?: QueueItemMediaItem | null;
 }
 
+/** An entry of a search result list; MediaItem and ItemMapping both carry these */
+export interface SearchResultItem {
+    item_id: string;
+    name: string;
+    uri: string;
+    media_type: string;
+}
+
+/** Result of the `music/search` command */
+export interface SearchResults {
+    artists?: SearchResultItem[];
+    albums?: SearchResultItem[];
+    genres?: SearchResultItem[];
+    tracks?: SearchResultItem[];
+    playlists?: SearchResultItem[];
+    radio?: SearchResultItem[];
+    audiobooks?: SearchResultItem[];
+    podcasts?: SearchResultItem[];
+    sound_effects?: SearchResultItem[];
+}
+
 export interface PlayerQueue {
     queue_id: string;
     display_name: string;

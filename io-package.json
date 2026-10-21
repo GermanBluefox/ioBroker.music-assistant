@@ -80,11 +80,20 @@
     "mode": "daemon",
     "type": "multimedia",
     "compact": true,
+    "declareUsedResources": true,
     "connectionType": "local",
     "dataSource": "push",
     "adminUI": {
       "config": "json"
     },
+    "plugins": {
+      "docker": {
+        "iobDockerComposeFiles": [
+          "docker-compose.yaml"
+        ]
+      }
+    },
+    "stopTimeout": 10000,
     "dependencies": [
       {
         "js-controller": ">=6.0.11"
@@ -92,20 +101,29 @@
     ],
     "globalDependencies": [
       {
-        "admin": ">=7.6.20"
+        "admin": ">=7.7.2"
       }
     ]
   },
   "native": {
     "host": "",
     "port": 8095,
-    "token": ""
+    "token": "",
+    "username": "admin",
+    "password": "",
+    "dockerMusicAssistant": {
+      "enabled": false,
+      "stopIfInstanceStopped": true,
+      "autoImageUpdate": true
+    }
   },
   "encryptedNative": [
-    "token"
+    "token",
+    "password"
   ],
   "protectedNative": [
-    "token"
+    "token",
+    "password"
   ],
   "objects": [],
   "instanceObjects": [

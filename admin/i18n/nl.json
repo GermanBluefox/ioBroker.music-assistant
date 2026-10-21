@@ -1,7 +1,17 @@
 {
     "API token": "API-token",
+    "At least 8 characters": "Minstens 8 tekens",
+    "Auto-update Docker image": "Docker-image automatisch bijwerken",
+    "credentials_info": "In plaats van met een token kan de adapter zich ook aanmelden met de gebruikersnaam en het wachtwoord van een Music Assistant-gebruiker. Een token wordt eerst geprobeerd.",
+    "docker_credentials_info": "Bij de eerste start maakt de adapter deze gebruiker aan als beheerder in Music Assistant en meldt zich daarmee aan. Meld je met dezelfde gegevens aan op http://<ioBroker-host>:8095 (of via de tegel \"Music Assistant\" op de introductiepagina) om de installatie te voltooien. Een latere wijziging hier verandert de gebruiker in Music Assistant niet.",
+    "docker_explanation": "ioBroker start en beheert de Music Assistant-server in een Docker-container op deze host. Docker moet geïnstalleerd zijn.",
+    "If enabled, the latest Docker image will be pulled when the adapter starts.": "Indien ingeschakeld, wordt de nieuwste Docker-image opgehaald wanneer de adapter start.",
     "Long-lived token from Settings → Profile on the Music Assistant server": "Token met lange levensduur van Instellingen → Profiel op de Music Assistant-server",
     "Music Assistant server host/IP": "Music Assistant-serverhost/IP",
+    "music-assistant adapter settings": "Adapterinstellingen voor music-assistant",
+    "Password": "Wachtwoord",
     "Port": "Poort",
-    "music-assistant adapter settings": "Adapterinstellingen voor music-assistant"
+    "Run Music Assistant in Docker": "Music Assistant in Docker uitvoeren",
+    "Stop container when instance stops": "Container stoppen wanneer de instantie stopt",
+    "Username": "Gebruikersnaam"
 }

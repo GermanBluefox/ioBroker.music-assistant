@@ -7,6 +7,13 @@ declare global {
             host: string;
             port: number;
             token: string;
+            username: string;
+            password: string;
+            dockerMusicAssistant?: {
+                enabled?: boolean;
+                stopIfInstanceStopped?: boolean;
+                autoImageUpdate?: boolean;
+            };
         }
     }
 }
