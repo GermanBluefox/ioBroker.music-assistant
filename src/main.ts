@@ -25,6 +25,13 @@ const DOCKER_PORT = 8095;
 const DOCKER_USED_PORTS = [DOCKER_PORT, 8097];
 /** Music Assistant refuses shorter passwords on the first-time setup */
 const MIN_PASSWORD_LENGTH = 8;
+/** Settings with folders of the host that docker-compose.yaml mounts into the container */
+const MEDIA_FOLDER_SETTINGS = ['mediaFolder1', 'mediaFolder2', 'mediaFolder3'] as const;
+/**
+ * `/path/on/host:/path/in/container` with an optional `:ro`/`:rw`, as the validator in jsonConfig checks
+ * it. `/data` is taken by the volume with the settings and the library of Music Assistant.
+ */
+const MEDIA_FOLDER_RE = /^\/[^:]+:\/(?!data(?:[/:]|$))[^:]+(?::(?:ro|rw))?$/;
 
 /** Feature of js-controller 8 for the registry of exclusive resources (e.g. TCP ports) */
 const USED_RESOURCES_FEATURE = 'CONTROLLER_USED_RESOURCES';
@@ -93,6 +100,16 @@ class MusicAssistant extends utils.Adapter {
 
         if (docker) {
             void this.reportUsedPorts();
+            // the plugin has already created the container with them, an invalid entry is skipped or
+            // taken for a named volume by it
+            for (const key of MEDIA_FOLDER_SETTINGS) {
+                const folder = this.config.dockerMusicAssistant?.[key];
+                if (folder && !MEDIA_FOLDER_RE.test(folder)) {
+                    this.log.warn(
+                        `Folder "${folder}" is not of the form "/path/on/host:/path/in/container[:ro]" and is not mounted as intended`,
+                    );
+                }
+            }
             if (!username || !password || password.length < MIN_PASSWORD_LENGTH) {
                 this.log.error(
                     `Music Assistant runs in Docker: enter a username and a password with at least ${MIN_PASSWORD_LENGTH} characters in the adapter settings`,

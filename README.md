@@ -40,6 +40,13 @@ Long-lived tokens expire after one year in Music Assistant. With username and pa
 signs in on every start and never runs into this. If both are set, the token is tried first and the
 credentials are used once it is refused.
 
+### Players tab
+
+The tab **Players** of the instance settings shows all players with cover, title, artist and position
+and controls them: play/pause, stop, next/previous, seek, volume, mute, shuffle, repeat and power. The
+text field below a player works like the state `playMedia` (see below). The tab only works while the
+instance runs and reads and writes the same states as every other adapter, so nothing needs to be saved.
+
 ## Music Assistant in Docker
 
 Instead of connecting to an existing server, the adapter can run Music Assistant itself in a Docker
@@ -76,8 +83,28 @@ Notes:
 - **Stop container when instance stops** stops Music Assistant together with the instance. Disable it
   if Music Assistant should keep playing while the adapter is stopped.
 - Network shares (SMB/NFS) that Music Assistant mounts itself need extra container privileges
-  (`SYS_ADMIN`, `DAC_READ_SEARCH`), which are not granted. Mount the share on the host instead or run
-  Music Assistant yourself if you need this.
+  (`SYS_ADMIN`, `DAC_READ_SEARCH`), which are not granted. Mount the share on the host instead and add
+  it as a folder (see below), or run Music Assistant yourself if you need this.
+
+### Music from a disk or a NAS
+
+Under **Folders of the host** up to three folders of the ioBroker host can be mounted into the
+container, in the Docker syntax `/path/on/host:/path/in/container`, with `:ro` at the end for read-only
+access:
+
+| Folder 1                         | Folder 2                                |
+|----------------------------------|-----------------------------------------|
+| `/mnt/nas/music:/media/music:ro` | `/srv/audiobooks:/media/audiobooks:ro`  |
+
+This gives the same mount as `- /mnt/nas/music:/media/music:ro` under `volumes:` of a docker-compose
+file. In Music Assistant, add the music provider **Local files** with the path in the container
+(`/media/music`). Empty folders are skipped. `/data` cannot be used as path in the container: it holds
+the settings of Music Assistant.
+
+- The host path must exist and be readable inside the container. A
+  NAS share has to be mounted on the host first, e.g. via `/etc/fstab`, and before Docker starts.
+- Changing a folder re-creates the container on the next start of the instance. Switching only `:ro`
+  on or off does not: the plugin does not compare the read-only flag, delete the container once by hand then.
 
 ## States
 
@@ -133,6 +160,7 @@ npm install
 npm run build   # compile TypeScript
 npm run test    # type-check + package tests
 npm run lint    # ESLint
+npm run build:admin  # build the "Players" tab (src-admin/ -> admin/custom/, commit the result)
 dev-server run  # run against a local test ioBroker instance (see README note below)
 ```
 
@@ -146,6 +174,7 @@ start/stop the instance manually from the Admin UI instead.
     ### **WORK IN PROGRESS**
 -->
 ### **WORK IN PROGRESS**
+* (@GermanBluefox) Added the tab "Players" to the instance settings to see and control the players
 * (@GermanBluefox) Breaking change: the buttons of a player moved from `players.<id>.control.*` directly into `players.<id>` and got the roles `button.play`, `button.pause`, ... The old `control` channel is deleted on the first start
 * (@GermanBluefox) Players are now recognized as media players by the type-detector (ioBroker.assistant, devices, ...): new numeric state `state` (`media.state`), `playbackState` keeps the raw text with the role `text`; `shuffle`, `repeat`, `duration` and `seek` were added to the player
 * (@GermanBluefox) Added `playMedia` to play a URI or the best hit of a search text
@@ -155,6 +184,7 @@ start/stop the instance manually from the Admin UI instead.
 * (@GermanBluefox) Added the option to run Music Assistant in Docker on the ioBroker host
 * (@GermanBluefox) In Docker mode the adapter creates the admin user of Music Assistant itself and signs in with username/password - no token needed
 * (@GermanBluefox) Username/password can be used instead of a token for an existing server as well
+* (@GermanBluefox) In Docker mode up to three folders of the host (music library, NAS share) can be mounted into the container
 * (@GermanBluefox) In Docker mode the host ports of the container (`8095`, `8097`) are reported to js-controller 8 (`registerUsedResource`)
 
 ### 0.0.2 (2026-10-18)

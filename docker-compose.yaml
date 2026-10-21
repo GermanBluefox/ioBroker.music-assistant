@@ -16,6 +16,12 @@ services:
         network_mode: host
         volumes:
             - ma_data:/data
+            # Folders of the host in the Docker syntax `/path/on/host:/path/in/container[:ro]`, e.g. the
+            # music library or a NAS share mounted on the host. An empty setting gives an empty entry,
+            # which the plugin skips.
+            - '${config.dockerMusicAssistant.mediaFolder1:-}'
+            - '${config.dockerMusicAssistant.mediaFolder2:-}'
+            - '${config.dockerMusicAssistant.mediaFolder3:-}'
         restart: unless-stopped
 
 volumes:

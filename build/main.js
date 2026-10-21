@@ -27,6 +27,8 @@ var import_objects = require("./lib/objects");
 const DOCKER_PORT = 8095;
 const DOCKER_USED_PORTS = [DOCKER_PORT, 8097];
 const MIN_PASSWORD_LENGTH = 8;
+const MEDIA_FOLDER_SETTINGS = ["mediaFolder1", "mediaFolder2", "mediaFolder3"];
+const MEDIA_FOLDER_RE = /^\/[^:]+:\/(?!data(?:[/:]|$))[^:]+(?::(?:ro|rw))?$/;
 const USED_RESOURCES_FEATURE = "CONTROLLER_USED_RESOURCES";
 function sanitizeId(id) {
   return id.replace(/[^a-zA-Z0-9_-]/g, "_");
@@ -49,7 +51,7 @@ class MusicAssistant extends utils.Adapter {
     this.on("unload", this.onUnload.bind(this));
   }
   async onReady() {
-    var _a, _b, _c, _d;
+    var _a, _b, _c, _d, _e;
     if (await this.updateWebUiLink()) {
       this.log.info("The link to the Music Assistant web interface was updated, the instance restarts");
       return;
@@ -63,6 +65,14 @@ class MusicAssistant extends utils.Adapter {
     const password = this.config.password;
     if (docker) {
       void this.reportUsedPorts();
+      for (const key of MEDIA_FOLDER_SETTINGS) {
+        const folder = (_e = this.config.dockerMusicAssistant) == null ? void 0 : _e[key];
+        if (folder && !MEDIA_FOLDER_RE.test(folder)) {
+          this.log.warn(
+            `Folder "${folder}" is not of the form "/path/on/host:/path/in/container[:ro]" and is not mounted as intended`
+          );
+        }
+      }
       if (!username || !password || password.length < MIN_PASSWORD_LENGTH) {
         this.log.error(
           `Music Assistant runs in Docker: enter a username and a password with at least ${MIN_PASSWORD_LENGTH} characters in the adapter settings`

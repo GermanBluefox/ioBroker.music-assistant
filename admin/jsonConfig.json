@@ -1,105 +1,189 @@
 {
     "i18n": true,
-    "type": "panel",
+    "type": "tabs",
     "items": {
-        "dockerMusicAssistant.enabled": {
-            "type": "checkDocker",
-            "label": "Run Music Assistant in Docker",
-            "help": "docker_explanation",
-            "newLine": true,
-            "xs": 12
+        "mainTab": {
+            "type": "panel",
+            "label": "Settings",
+            "items": {
+                "dockerMusicAssistant.enabled": {
+                    "type": "checkDocker",
+                    "label": "Run Music Assistant in Docker",
+                    "help": "docker_explanation",
+                    "newLine": true,
+                    "xs": 12
+                },
+                "host": {
+                    "type": "text",
+                    "label": "Music Assistant server host/IP",
+                    "hidden": "!!data.dockerMusicAssistant?.enabled",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "port": {
+                    "type": "number",
+                    "label": "Port",
+                    "default": 8095,
+                    "min": 1,
+                    "max": 65535,
+                    "hidden": "!!data.dockerMusicAssistant?.enabled",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "token": {
+                    "type": "password",
+                    "label": "API token",
+                    "help": "Long-lived token from Settings → Profile on the Music Assistant server",
+                    "hidden": "!!data.dockerMusicAssistant?.enabled",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "_credentialsInfo": {
+                    "type": "staticText",
+                    "text": "credentials_info",
+                    "hidden": "!!data.dockerMusicAssistant?.enabled",
+                    "newLine": true,
+                    "xs": 12
+                },
+                "_dockerCredentialsInfo": {
+                    "type": "staticText",
+                    "text": "docker_credentials_info",
+                    "hidden": "!data.dockerMusicAssistant?.enabled",
+                    "newLine": true,
+                    "xs": 12
+                },
+                "username": {
+                    "type": "text",
+                    "label": "Username",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "password": {
+                    "type": "password",
+                    "label": "Password",
+                    "visible": true,
+                    "validator": "!data.dockerMusicAssistant?.enabled || (data.password || '').length >= 8",
+                    "validatorErrorText": "At least 8 characters",
+                    "validatorNoSaveOnError": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "dockerMusicAssistant.stopIfInstanceStopped": {
+                    "type": "checkbox",
+                    "label": "Stop container when instance stops",
+                    "hidden": "!data.dockerMusicAssistant?.enabled",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6
+                },
+                "dockerMusicAssistant.autoImageUpdate": {
+                    "type": "checkbox",
+                    "label": "Auto-update Docker image",
+                    "help": "If enabled, the latest Docker image will be pulled when the adapter starts.",
+                    "hidden": "!data.dockerMusicAssistant?.enabled",
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6
+                },
+                "_mediaFoldersHeader": {
+                    "type": "header",
+                    "text": "Folders of the host",
+                    "size": 5,
+                    "hidden": "!data.dockerMusicAssistant?.enabled",
+                    "newLine": true,
+                    "xs": 12
+                },
+                "_mediaFoldersInfo": {
+                    "type": "staticText",
+                    "text": "media_folders_info",
+                    "hidden": "!data.dockerMusicAssistant?.enabled",
+                    "newLine": true,
+                    "xs": 12
+                },
+                "dockerMusicAssistant.mediaFolder1": {
+                    "type": "text",
+                    "label": "Folder 1",
+                    "placeholder": "/mnt/nas/music:/media/music:ro",
+                    "hidden": "!data.dockerMusicAssistant?.enabled",
+                    "validator": "!data.dockerMusicAssistant?.mediaFolder1 || /^\\/[^:]+:\\/(?!data(?:[\\/:]|$))[^:]+(?::(?:ro|rw))?$/.test(data.dockerMusicAssistant.mediaFolder1)",
+                    "validatorErrorText": "Format: /path/on/host:/path/in/container[:ro]",
+                    "validatorNoSaveOnError": true,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 6,
+                    "xl": 6
+                },
+                "dockerMusicAssistant.mediaFolder2": {
+                    "type": "text",
+                    "label": "Folder 2",
+                    "placeholder": "/mnt/nas/music:/media/music:ro",
+                    "hidden": "!data.dockerMusicAssistant?.enabled",
+                    "validator": "!data.dockerMusicAssistant?.mediaFolder2 || /^\\/[^:]+:\\/(?!data(?:[\\/:]|$))[^:]+(?::(?:ro|rw))?$/.test(data.dockerMusicAssistant.mediaFolder2)",
+                    "validatorErrorText": "Format: /path/on/host:/path/in/container[:ro]",
+                    "validatorNoSaveOnError": true,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 6,
+                    "xl": 6
+                },
+                "dockerMusicAssistant.mediaFolder3": {
+                    "type": "text",
+                    "label": "Folder 3",
+                    "placeholder": "/mnt/nas/music:/media/music:ro",
+                    "hidden": "!data.dockerMusicAssistant?.enabled",
+                    "validator": "!data.dockerMusicAssistant?.mediaFolder3 || /^\\/[^:]+:\\/(?!data(?:[\\/:]|$))[^:]+(?::(?:ro|rw))?$/.test(data.dockerMusicAssistant.mediaFolder3)",
+                    "validatorErrorText": "Format: /path/on/host:/path/in/container[:ro]",
+                    "validatorNoSaveOnError": true,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 6,
+                    "xl": 6
+                }
+            }
         },
-        "host": {
-            "type": "text",
-            "label": "Music Assistant server host/IP",
-            "hidden": "!!data.dockerMusicAssistant?.enabled",
-            "newLine": true,
-            "xs": 12,
-            "sm": 12,
-            "md": 6,
-            "lg": 4,
-            "xl": 4
-        },
-        "port": {
-            "type": "number",
-            "label": "Port",
-            "default": 8095,
-            "min": 1,
-            "max": 65535,
-            "hidden": "!!data.dockerMusicAssistant?.enabled",
-            "newLine": true,
-            "xs": 12,
-            "sm": 12,
-            "md": 6,
-            "lg": 4,
-            "xl": 4
-        },
-        "token": {
-            "type": "password",
-            "label": "API token",
-            "help": "Long-lived token from Settings → Profile on the Music Assistant server",
-            "hidden": "!!data.dockerMusicAssistant?.enabled",
-            "newLine": true,
-            "xs": 12,
-            "sm": 12,
-            "md": 6,
-            "lg": 4,
-            "xl": 4
-        },
-        "_credentialsInfo": {
-            "type": "staticText",
-            "text": "credentials_info",
-            "hidden": "!!data.dockerMusicAssistant?.enabled",
-            "newLine": true,
-            "xs": 12
-        },
-        "_dockerCredentialsInfo": {
-            "type": "staticText",
-            "text": "docker_credentials_info",
-            "hidden": "!data.dockerMusicAssistant?.enabled",
-            "newLine": true,
-            "xs": 12
-        },
-        "username": {
-            "type": "text",
-            "label": "Username",
-            "newLine": true,
-            "xs": 12,
-            "sm": 12,
-            "md": 6,
-            "lg": 4,
-            "xl": 4
-        },
-        "password": {
-            "type": "password",
-            "label": "Password",
-            "visible": true,
-            "validator": "!data.dockerMusicAssistant?.enabled || (data.password || '').length >= 8",
-            "validatorErrorText": "At least 8 characters",
-            "validatorNoSaveOnError": true,
-            "xs": 12,
-            "sm": 12,
-            "md": 6,
-            "lg": 4,
-            "xl": 4
-        },
-        "dockerMusicAssistant.stopIfInstanceStopped": {
-            "type": "checkbox",
-            "label": "Stop container when instance stops",
-            "hidden": "!data.dockerMusicAssistant?.enabled",
-            "newLine": true,
-            "xs": 12,
-            "sm": 12,
-            "md": 6
-        },
-        "dockerMusicAssistant.autoImageUpdate": {
-            "type": "checkbox",
-            "label": "Auto-update Docker image",
-            "help": "If enabled, the latest Docker image will be pulled when the adapter starts.",
-            "hidden": "!data.dockerMusicAssistant?.enabled",
-            "xs": 12,
-            "sm": 12,
-            "md": 6
+        "playersTab": {
+            "type": "panel",
+            "label": "Players",
+            "items": {
+                "_players": {
+                    "type": "custom",
+                    "i18n": true,
+                    "url": "custom/customComponents.js",
+                    "name": "ConfigCustomMusicAssistantSet/Components/PlayersComponent",
+                    "guiApi": 2,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                }
+            }
         }
     }
 }

@@ -18,7 +18,11 @@ export default [
             'admin/admin.d.ts',
             'admin/blockly.js',
             '**/adapter-config.d.ts',
-            'widgets/**/*.js'
+            'widgets/**/*.js',
+            // own eslint config and build, see src-admin/
+            'src-admin/',
+            'admin/custom/',
+            'tasks.mts'
         ],
     },
     {

@@ -20,3 +20,8 @@ Thumbs.db
 # i18n intermediate files
 admin/i18n/flat.txt
 admin/i18n/*/flat.txt
+# JsonConfig custom component: the sources are built with vite and the result in admin/custom/ is
+# committed, because the module federation build takes a while - see tasks.mts
+src-admin/node_modules/
+src-admin/build/
+src-admin/.__mf__temp/

@@ -114,7 +114,10 @@
     "dockerMusicAssistant": {
       "enabled": false,
       "stopIfInstanceStopped": true,
-      "autoImageUpdate": true
+      "autoImageUpdate": true,
+      "mediaFolder1": "",
+      "mediaFolder2": "",
+      "mediaFolder3": ""
     }
   },
   "encryptedNative": [
