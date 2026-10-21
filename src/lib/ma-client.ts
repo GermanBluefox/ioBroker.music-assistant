@@ -159,11 +159,13 @@ export class MaClient extends EventEmitter {
             body: JSON.stringify({ username, password, device_name: DEVICE_NAME }),
             signal: AbortSignal.timeout(AUTH_TIMEOUT_MS),
         });
-        if (res.status === 409) {
+        const body = (await res.json().catch(() => null)) as SetupResponse | null;
+        // Current servers answer an existing admin with 409, older ones with 400 and the same error
+        // text - which must not be taken for invalid credentials
+        if (res.status === 409 || (!res.ok && /already completed/i.test(body?.error ?? ''))) {
             this.setupDone = true;
             return;
         }
-        const body = (await res.json().catch(() => null)) as SetupResponse | null;
         if (res.ok && body?.success && body.token) {
             this.setupDone = true;
             this.accessToken = body.token;

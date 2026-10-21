@@ -107,6 +107,7 @@ class MaClient extends import_node_events.EventEmitter {
    * already has a user answers with 409, then the normal login follows.
    */
   async runFirstTimeSetup() {
+    var _a;
     const { username, password } = this.auth;
     if (!username || !password) {
       throw new MaAuthError("Username and password are required to set up Music Assistant");
@@ -117,11 +118,11 @@ class MaClient extends import_node_events.EventEmitter {
       body: JSON.stringify({ username, password, device_name: DEVICE_NAME }),
       signal: AbortSignal.timeout(AUTH_TIMEOUT_MS)
     });
-    if (res.status === 409) {
+    const body = await res.json().catch(() => null);
+    if (res.status === 409 || !res.ok && /already completed/i.test((_a = body == null ? void 0 : body.error) != null ? _a : "")) {
       this.setupDone = true;
       return;
     }
-    const body = await res.json().catch(() => null);
     if (res.ok && (body == null ? void 0 : body.success) && body.token) {
       this.setupDone = true;
       this.accessToken = body.token;

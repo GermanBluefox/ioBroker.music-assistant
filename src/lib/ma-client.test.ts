@@ -15,6 +15,8 @@ interface FakeState {
     commands: string[];
     authedWith: string[];
     sockets: Set<WebSocket>;
+    /** Status of the answer to `POST /setup` when the admin exists: 409 now, 400 on older servers */
+    setupCompletedStatus: number;
 }
 
 function freshState(): FakeState {
@@ -27,6 +29,7 @@ function freshState(): FakeState {
         commands: [],
         authedWith: [],
         sockets: new Set(),
+        setupCompletedStatus: 409,
     };
 }
 
@@ -52,7 +55,7 @@ class FakeServer {
                     res.writeHead(status, { 'Content-Type': 'application/json' }).end(JSON.stringify(data));
                 };
                 if (state.user) {
-                    return reply(409, { success: false, error: 'Setup already completed' });
+                    return reply(state.setupCompletedStatus, { success: false, error: 'Setup already completed' });
                 }
                 if (password.length < 8) {
                     return reply(400, { success: false, error: 'Password must be at least 8 characters' });
@@ -211,6 +214,14 @@ describe('MaClient authentication', function () {
         await c.connect();
         expect(setupEmitted).to.equal(false);
         expect(server.state.setupCalls).to.equal(1);
+        expect(server.state.commands).to.deep.equal(['auth/login', 'auth']);
+    });
+
+    it('signs in when an older server answers the finished setup with 400', async () => {
+        server.state.user = { username: 'admin', password: 'secret123' };
+        server.state.setupCompletedStatus = 400;
+        const c = connectClient(CREDENTIALS);
+        await c.connect();
         expect(server.state.commands).to.deep.equal(['auth/login', 'auth']);
     });
 
