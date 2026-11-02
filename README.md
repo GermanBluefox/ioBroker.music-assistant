@@ -20,36 +20,137 @@ Control Music Assistant players and queues from ioBroker
 
 ## Prerequisites
 
-- A running [Music Assistant](https://music-assistant.io) server, reachable from your ioBroker host.
-- An API token: on the Music Assistant server, go to **Settings → Profile** and create a long-lived token.
+- A running [Music Assistant](https://music-assistant.io) server, reachable from your ioBroker host -
+  or Docker on the ioBroker host, then the adapter can run the server itself (see [Music Assistant in Docker](#music-assistant-in-docker)).
+- An API token (on the Music Assistant server, go to **Settings → Profile** and create a long-lived
+  token) or the username and password of a Music Assistant user.
 
 ## Configuration
 
 In the adapter instance settings, enter:
 
-| Field | Description |
-|-------|-------------|
-| Host  | Hostname or IP of the Music Assistant server |
-| Port  | WebSocket API port (default `8095`) |
-| Token | The long-lived API token created above |
+| Field               | Description                                                  |
+|---------------------|--------------------------------------------------------------|
+| Host                | Hostname or IP of the Music Assistant server                 |
+| Port                | WebSocket API port (default `8095`)                          |
+| Token               | The long-lived API token created above                       |
+| Username / Password | Alternative to the token: credentials of a Music Assistant user |
+
+Long-lived tokens expire after one year in Music Assistant. With username and password the adapter
+signs in on every start and never runs into this. If both are set, the token is tried first and the
+credentials are used once it is refused.
+
+### Players tab
+
+The tab **Players** of the instance settings shows all players with cover, title, artist and position
+and controls them: play/pause, stop, next/previous, seek, volume, mute, shuffle, repeat and power. The
+text field below a player works like the state `playMedia` (see below). The tab only works while the
+instance runs and reads and writes the same states as every other adapter, so nothing needs to be saved.
+
+## Music Assistant in Docker
+
+Instead of connecting to an existing server, the adapter can run Music Assistant itself in a Docker
+container on the ioBroker host. Docker must be installed and running there, and the `iobroker` user
+must have access to the docker CLI (to fix the rights, run `iob fix`).
+
+1. Enable **Run Music Assistant in Docker** in the instance settings, enter a **Username** (default
+   `admin`) and a **Password** (at least 8 characters) and save. Host, port and token are hidden then:
+   the adapter connects to `127.0.0.1:8095` on its own. The container `iob_music_assistant_<instance>`
+   with the image `ghcr.io/music-assistant/server` is created and started.
+2. As soon as the server answers, the adapter creates this user as administrator in Music Assistant
+   (the same first-time setup the web interface offers) and signs in with it. No token is needed.
+3. Open `http://<ioBroker-host>:8095` in the browser - or click the _Music Assistant_ tile on the intro
+   page of admin (also shown as link in the instance list; the adapter adds this link and restarts its
+   instance once for it) - log in with the same username and password and finish the setup there
+   (music sources, player providers).
+
+The user is only created on the very first start, while Music Assistant has no user yet. Changing
+username or password in the adapter settings later does not change it in Music Assistant: change the
+password in Music Assistant first (**Settings → Profile**), then enter the new one in the adapter
+settings. If the credentials are refused, the adapter logs an error and stops retrying until it is restarted.
+
+Notes:
+
+- The container runs with `network_mode: host`, because Music Assistant finds the players (Sonos,
+  Chromecast, AirPlay, DLNA, ...) via mDNS/SSDP and the players fetch the audio stream from it. The
+  web interface/API (port `8095`) and the stream server (port `8097`) are therefore opened directly on
+  the host, and these ports must be free. With js-controller 8 the adapter reports both ports as
+  used by its instance and warns if another instance already holds one of them. Host networking works on Linux; on Docker Desktop
+  (Windows/macOS) it has to be enabled in the Docker settings and discovery may still be limited.
+- All settings and the library live in the docker volume `ma_data` (`iob_music_assistant_<instance>_ma_data`),
+  so they survive an update or a re-creation of the container. The volume is included in ioBroker backups.
+- **Auto-update Docker image** pulls the latest image on every adapter start.
+- **Stop container when instance stops** stops Music Assistant together with the instance. Disable it
+  if Music Assistant should keep playing while the adapter is stopped.
+- Network shares (SMB/NFS) that Music Assistant mounts itself need extra container privileges
+  (`SYS_ADMIN`, `DAC_READ_SEARCH`), which are not granted. Mount the share on the host instead and add
+  it as a folder (see below), or run Music Assistant yourself if you need this.
+
+### Music from a disk or a NAS
+
+Under **Folders of the host** up to three folders of the ioBroker host can be mounted into the
+container, in the Docker syntax `/path/on/host:/path/in/container`, with `:ro` at the end for read-only
+access:
+
+| Folder 1                         | Folder 2                                |
+|----------------------------------|-----------------------------------------|
+| `/mnt/nas/music:/media/music:ro` | `/srv/audiobooks:/media/audiobooks:ro`  |
+
+This gives the same mount as `- /mnt/nas/music:/media/music:ro` under `volumes:` of a docker-compose
+file. In Music Assistant, add the music provider **Local files** with the path in the container
+(`/media/music`). Empty folders are skipped. `/data` cannot be used as path in the container: it holds
+the settings of Music Assistant.
+
+- The host path must exist and be readable inside the container. A
+  NAS share has to be mounted on the host first, e.g. via `/etc/fstab`, and before Docker starts.
+- Changing a folder re-creates the container on the next start of the instance. Switching only `:ro`
+  on or off does not: the plugin does not compare the read-only flag, delete the container once by hand then.
 
 ## States
 
-For every Music Assistant player, the adapter creates `music-assistant.0.players.<player_id>` with:
+For every Music Assistant player, the adapter creates the channel `music-assistant.0.players.<player_id>`
+(role `media.music`) with:
 
-| State | Description |
-|-------|-------------|
-| `available`, `powered`, `playbackState`, `activeSource` | Player status |
-| `volume`, `muted` | Writable volume control |
-| `mediaTitle`, `mediaArtist`, `mediaAlbum`, `mediaImage`, `elapsedTime` | Now-playing metadata |
-| `control.play` / `pause` / `playPause` / `stop` / `next` / `previous` | Writable control buttons |
+| State                                                                         | Description                                                        |
+|-------------------------------------------------------------------------------|--------------------------------------------------------------------|
+| `state`                                                                       | `0` = pause, `1` = play, `2` = stop (role `media.state`)           |
+| `playbackState`                                                               | Raw state of Music Assistant: `idle`, `paused`, `playing`          |
+| `available`, `powered`, `name`, `activeSource`, `queueId`                     | Player status (`powered` is writable)                              |
+| `volume` (0-100 %), `muted`                                                   | Writable volume control                                            |
+| `shuffle`, `repeat` (`0` = off, `1` = all, `2` = one)                         | Writable, the settings of the player's queue                       |
+| `mediaTitle`, `mediaArtist`, `mediaAlbum`, `mediaImage`                       | Now-playing metadata                                               |
+| `elapsedTime`, `duration`, `seek`                                             | Position and length in seconds; write `seek` to jump to a position |
+| `play`, `pause`, `playPause`, `stop`, `next`, `previous`                      | Writable buttons (`button.play`, `button.pause`, ...)              |
+| `playMedia`                                                                   | Write a URI or a search text to play it, see below                 |
+
+The player channel is laid out the way `@iobroker/type-detector` expects a media player, so
+ioBroker.assistant, ioBroker.devices, the material UI and other adapters recognize it as a media
+player. Assign the channel to a room (`enum.rooms`) for that: devices without a room or function are
+not offered by these adapters.
+
+Writable states are acknowledged with the value Music Assistant reports after the command, not with
+the requested one - a volume the player cannot take shows its real value.
+
+### Play something: `playMedia`
+
+- A **URI** as Music Assistant uses it, e.g. `library://playlist/3`, `spotify://track/4uLU6hMCjMI75M1A2tKUQC`
+  or the URL of a stream, is played directly.
+- Any other text is **searched** in all music sources. An item whose name is exactly the text wins
+  (an artist before a playlist, album or track of the same name), otherwise the best matching track.
+- A prefix narrows the search: `artist:Queen`, `album:A Night at the Opera`, `track:Bohemian Rhapsody`,
+  `playlist:Party`, `radio:SWR3` (also `podcast:`, `audiobook:`, `genre:`).
+
+It replaces what the player's queue is playing now.
+
+A player that is deleted in Music Assistant is removed in ioBroker as well (also when it was deleted
+while the adapter was not running), together with its queue.
 
 For every player queue, `music-assistant.0.queues.<queue_id>` gets:
 
-| State | Description |
-|-------|-------------|
-| `state`, `displayName`, `available`, `currentItemName`, `elapsedTime` | Queue status |
-| `shuffleEnabled`, `repeatMode` | Writable queue settings |
+| State                                                                 | Description              |
+|-----------------------------------------------------------------------|--------------------------|
+| `state`, `displayName`, `available`, `currentItemName`, `elapsedTime` | Queue status             |
+| `shuffleEnabled`, `repeatMode`                                        | Writable queue settings  |
 | `control.play` / `pause` / `playPause` / `stop` / `next` / `previous` | Writable control buttons |
 
 ## For developers
@@ -59,6 +160,7 @@ npm install
 npm run build   # compile TypeScript
 npm run test    # type-check + package tests
 npm run lint    # ESLint
+npm run build:admin  # build the "Players" tab (src-admin/ -> admin/custom/, commit the result)
 dev-server run  # run against a local test ioBroker instance (see README note below)
 ```
 
@@ -71,6 +173,20 @@ start/stop the instance manually from the Admin UI instead.
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+* (@GermanBluefox) Added the tab "Players" to the instance settings to see and control the players
+* (@GermanBluefox) Breaking change: the buttons of a player moved from `players.<id>.control.*` directly into `players.<id>` and got the roles `button.play`, `button.pause`, ... The old `control` channel is deleted on the first start
+* (@GermanBluefox) Players are now recognized as media players by the type-detector (ioBroker.assistant, devices, ...): new numeric state `state` (`media.state`), `playbackState` keeps the raw text with the role `text`; `shuffle`, `repeat`, `duration` and `seek` were added to the player
+* (@GermanBluefox) Added `playMedia` to play a URI or the best hit of a search text
+* (@GermanBluefox) Players and queues deleted in Music Assistant are removed from ioBroker
+* (@GermanBluefox) Written values are acknowledged with what Music Assistant reports after the command
+* (@GermanBluefox) States are only written when their value changes
+* (@GermanBluefox) Added the option to run Music Assistant in Docker on the ioBroker host
+* (@GermanBluefox) In Docker mode the adapter creates the admin user of Music Assistant itself and signs in with username/password - no token needed
+* (@GermanBluefox) Username/password can be used instead of a token for an existing server as well
+* (@GermanBluefox) In Docker mode up to three folders of the host (music library, NAS share) can be mounted into the container
+* (@GermanBluefox) In Docker mode the host ports of the container (`8095`, `8097`) are reported to js-controller 8 (`registerUsedResource`)
+
 ### 0.0.2 (2026-10-18)
 * (M1kad0) republish to fix the npm release
 

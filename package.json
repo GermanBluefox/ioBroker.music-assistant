@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@iobroker/adapter-core": "^3.4.3",
+    "@iobroker/plugin-docker": "^1.2.1",
     "ws": "^8.18.0"
   },
   "devDependencies": {
@@ -33,9 +34,11 @@
     "@alcalzone/release-script-plugin-license": "^5.2.2",
     "@alcalzone/release-script-plugin-manual-review": "^5.2.0",
     "@iobroker/adapter-dev": "^1.5.0",
+    "@iobroker/build-tools": "^3.0.3",
     "@iobroker/dev-server": "^0.8.0",
     "@iobroker/eslint-config": "^2.3.4",
     "@iobroker/testing": "^6.3.1",
+    "@iobroker/type-detector": "^6.0.3",
     "@tsconfig/node22": "^22.0.2",
     "@types/iobroker": "npm:@iobroker/types@^7.2.5",
     "@types/node": "^22.18.10",
@@ -52,6 +55,7 @@
     "build/",
     "www/",
     "io-package.json",
+    "docker-compose.yaml",
     "LICENSE"
   ],
   "scripts": {
@@ -61,12 +65,15 @@
     "prebuild:ts": "rimraf build",
     "build:ts": "build-adapter ts",
     "watch:ts": "build-adapter ts --watch",
+    "build:admin": "node tasks.mts",
     "test:ts": "mocha --config test/mocharc.custom.json src/**/*.test.ts",
     "test:package": "mocha test/package --exit",
     "test:integration": "mocha test/integration --exit",
     "test": "npm run test:ts && npm run test:package",
     "check": "tsc --noEmit",
     "lint": "eslint -c eslint.config.mjs .",
+    "lint:admin": "cd src-admin && npm run lint",
+    "check:admin": "cd src-admin && npm run check-ts",
     "translate": "translate-adapter",
     "release": "release-script",
     "dev-server": "dev-server"

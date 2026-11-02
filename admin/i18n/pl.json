@@ -1,7 +1,25 @@
 {
     "API token": "Token API",
+    "At least 8 characters": "Co najmniej 8 znaków",
+    "Auto-update Docker image": "Automatycznie aktualizuj obraz Docker",
+    "credentials_info": "Zamiast tokena adapter może też logować się nazwą użytkownika i hasłem użytkownika Music Assistant. Najpierw próbowany jest token.",
+    "docker_credentials_info": "Przy pierwszym uruchomieniu adapter tworzy tego użytkownika jako administratora w Music Assistant i loguje się nim. Zaloguj się tymi samymi danymi na http://<ioBroker-host>:8095 (lub przez kafelek „Music Assistant” na stronie startowej), aby dokończyć konfigurację. Późniejsza zmiana tutaj nie zmienia użytkownika w Music Assistant.",
+    "docker_explanation": "ioBroker uruchamia serwer Music Assistant w kontenerze Docker na tym hoście i nim zarządza. Docker musi być zainstalowany.",
+    "Folder 1": "Folder 1",
+    "Folder 2": "Folder 2",
+    "Folder 3": "Folder 3",
+    "Folders of the host": "Foldery hosta",
+    "Format: /path/on/host:/path/in/container[:ro]": "Format: /ścieżka/na/hoście:/ścieżka/w/kontenerze[:ro]",
+    "If enabled, the latest Docker image will be pulled when the adapter starts.": "Jeśli włączone, najnowszy obraz Docker zostanie pobrany przy starcie adaptera.",
     "Long-lived token from Settings → Profile on the Music Assistant server": "Długowieczny token z Ustawienia → Profil na serwerze Music Assistant",
+    "media_folders_info": "Foldery hosta ioBroker montowane w kontenerze, np. biblioteka muzyczna lub udział NAS zamontowany na hoście. Format: /ścieżka/na/hoście:/ścieżka/w/kontenerze, z :ro na końcu dla dostępu tylko do odczytu. W Music Assistant dodaj dostawcę muzyki \"Local files\" ze ścieżką w kontenerze, np. /media/music.",
     "Music Assistant server host/IP": "Host/adres IP serwera Music Assistant",
+    "music-assistant adapter settings": "Ustawienia adaptera dla music-assistant",
+    "Password": "Hasło",
+    "Players": "Odtwarzacze",
     "Port": "Port",
-    "music-assistant adapter settings": "Ustawienia adaptera dla music-assistant"
+    "Run Music Assistant in Docker": "Uruchom Music Assistant w Dockerze",
+    "Settings": "Ustawienia",
+    "Stop container when instance stops": "Zatrzymaj kontener po zatrzymaniu instancji",
+    "Username": "Nazwa użytkownika"
 }

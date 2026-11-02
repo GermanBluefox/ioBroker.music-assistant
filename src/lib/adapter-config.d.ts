@@ -7,6 +7,17 @@ declare global {
             host: string;
             port: number;
             token: string;
+            username: string;
+            password: string;
+            dockerMusicAssistant?: {
+                enabled?: boolean;
+                stopIfInstanceStopped?: boolean;
+                autoImageUpdate?: boolean;
+                /** Folders of the host mounted into the container: `/path/on/host:/path/in/container[:ro]` */
+                mediaFolder1?: string;
+                mediaFolder2?: string;
+                mediaFolder3?: string;
+            };
         }
     }
 }

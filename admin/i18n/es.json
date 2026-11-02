@@ -1,7 +1,25 @@
 {
     "API token": "token API",
+    "At least 8 characters": "Al menos 8 caracteres",
+    "Auto-update Docker image": "Actualizar automáticamente la imagen de Docker",
+    "credentials_info": "En lugar de un token, el adaptador también puede iniciar sesión con el nombre de usuario y la contraseña de un usuario de Music Assistant. Primero se prueba el token.",
+    "docker_credentials_info": "En el primer inicio, el adaptador crea este usuario como administrador en Music Assistant e inicia sesión con él. Inicie sesión con las mismas credenciales en http://<ioBroker-host>:8095 (o en el mosaico \"Music Assistant\" de la página de inicio) para completar la configuración. Cambiarlas aquí más tarde no cambia el usuario en Music Assistant.",
+    "docker_explanation": "ioBroker inicia y gestiona el servidor de Music Assistant en un contenedor Docker en este host. Docker debe estar instalado.",
+    "Folder 1": "Carpeta 1",
+    "Folder 2": "Carpeta 2",
+    "Folder 3": "Carpeta 3",
+    "Folders of the host": "Carpetas del host",
+    "Format: /path/on/host:/path/in/container[:ro]": "Formato: /ruta/en/host:/ruta/en/contenedor[:ro]",
+    "If enabled, the latest Docker image will be pulled when the adapter starts.": "Si está activado, se descargará la imagen de Docker más reciente al iniciar el adaptador.",
     "Long-lived token from Settings → Profile on the Music Assistant server": "Token de larga duración desde Configuración → Perfil en el servidor Music Assistant",
+    "media_folders_info": "Carpetas del host de ioBroker que se montan en el contenedor, p. ej. la biblioteca de música o un recurso compartido NAS montado en el host. Formato: /ruta/en/host:/ruta/en/contenedor, con :ro al final para acceso de solo lectura. En Music Assistant, añada el proveedor de música \"Local files\" con la ruta en el contenedor, p. ej. /media/music.",
     "Music Assistant server host/IP": "IP/host del servidor Music Assistant",
+    "music-assistant adapter settings": "Ajustes del adaptador para music-assistant",
+    "Password": "Contraseña",
+    "Players": "Reproductores",
     "Port": "Puerto",
-    "music-assistant adapter settings": "Ajustes del adaptador para music-assistant"
+    "Run Music Assistant in Docker": "Ejecutar Music Assistant en Docker",
+    "Settings": "Ajustes",
+    "Stop container when instance stops": "Detener el contenedor cuando se detenga la instancia",
+    "Username": "Nombre de usuario"
 }

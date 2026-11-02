@@ -1,7 +1,25 @@
 {
     "API token": "Jeton API",
+    "At least 8 characters": "Au moins 8 caractères",
+    "Auto-update Docker image": "Mettre à jour automatiquement l’image Docker",
+    "credentials_info": "Au lieu d’un jeton, l’adaptateur peut aussi se connecter avec le nom d’utilisateur et le mot de passe d’un utilisateur de Music Assistant. Le jeton est essayé en premier.",
+    "docker_credentials_info": "Au premier démarrage, l’adaptateur crée cet utilisateur comme administrateur dans Music Assistant et se connecte avec lui. Connectez-vous avec les mêmes identifiants sur http://<ioBroker-host>:8095 (ou via la tuile « Music Assistant » de la page d’accueil) pour terminer la configuration. Les modifier ici plus tard ne modifie pas l’utilisateur dans Music Assistant.",
+    "docker_explanation": "ioBroker démarre et gère le serveur Music Assistant dans un conteneur Docker sur cet hôte. Docker doit être installé.",
+    "Folder 1": "Dossier 1",
+    "Folder 2": "Dossier 2",
+    "Folder 3": "Dossier 3",
+    "Folders of the host": "Dossiers de l’hôte",
+    "Format: /path/on/host:/path/in/container[:ro]": "Format : /chemin/sur/hote:/chemin/dans/conteneur[:ro]",
+    "If enabled, the latest Docker image will be pulled when the adapter starts.": "Si activé, la dernière image Docker est téléchargée au démarrage de l’adaptateur.",
     "Long-lived token from Settings → Profile on the Music Assistant server": "Jeton de longue durée depuis Paramètres → Profil sur le serveur Music Assistant",
+    "media_folders_info": "Dossiers de l’hôte ioBroker montés dans le conteneur, par ex. la bibliothèque musicale ou un partage NAS monté sur l’hôte. Format : /chemin/sur/hote:/chemin/dans/conteneur, avec :ro à la fin pour un accès en lecture seule. Dans Music Assistant, ajoutez le fournisseur de musique \"Local files\" avec le chemin dans le conteneur, par ex. /media/music.",
     "Music Assistant server host/IP": "Hôte/IP du serveur Music Assistant",
+    "music-assistant adapter settings": "Paramètres d'adaptateur pour music-assistant",
+    "Password": "Mot de passe",
+    "Players": "Lecteurs",
     "Port": "Port",
-    "music-assistant adapter settings": "Paramètres d'adaptateur pour music-assistant"
+    "Run Music Assistant in Docker": "Exécuter Music Assistant dans Docker",
+    "Settings": "Paramètres",
+    "Stop container when instance stops": "Arrêter le conteneur lorsque l’instance s’arrête",
+    "Username": "Nom d’utilisateur"
 }
