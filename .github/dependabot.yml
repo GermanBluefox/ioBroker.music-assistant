@@ -17,6 +17,19 @@ updates:
         update-types:
           - "version-update:semver-major"
 
+  - package-ecosystem: npm
+    directory: "/src-admin"
+    schedule:
+      interval: cron
+      cronjob: "41 2 13 * *"
+      timezone: Europe/Berlin
+    open-pull-requests-limit: 15
+    assignees:
+      - NurPech
+    versioning-strategy: increase
+    cooldown:
+      default-days: 7
+
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
