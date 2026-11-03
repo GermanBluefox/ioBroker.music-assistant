@@ -139,7 +139,9 @@
                 "dockerMusicAssistant.mediaFolder1": {
                     "type": "text",
                     "label": "Folder 1",
-                    "placeholder": "/mnt/nas/music:/media/music:ro",
+                    "placeholder": {
+                        "en": "/mnt/nas/music:/media/music:ro"
+                    },
                     "hidden": "!data.dockerMusicAssistant?.enabled",
                     "validator": "!data.dockerMusicAssistant?.mediaFolder1 || /^\\/[^:]+:\\/(?!data(?:[\\/:]|$))[^:]+(?::(?:ro|rw))?$/.test(data.dockerMusicAssistant.mediaFolder1)",
                     "validatorErrorText": "Format: /path/on/host:/path/in/container[:ro]",
@@ -154,7 +156,9 @@
                 "dockerMusicAssistant.mediaFolder2": {
                     "type": "text",
                     "label": "Folder 2",
-                    "placeholder": "/mnt/nas/music:/media/music:ro",
+                    "placeholder": {
+                        "en": "/mnt/nas/music:/media/music:ro"
+                    },
                     "hidden": "!data.dockerMusicAssistant?.enabled",
                     "validator": "!data.dockerMusicAssistant?.mediaFolder2 || /^\\/[^:]+:\\/(?!data(?:[\\/:]|$))[^:]+(?::(?:ro|rw))?$/.test(data.dockerMusicAssistant.mediaFolder2)",
                     "validatorErrorText": "Format: /path/on/host:/path/in/container[:ro]",
@@ -169,7 +173,9 @@
                 "dockerMusicAssistant.mediaFolder3": {
                     "type": "text",
                     "label": "Folder 3",
-                    "placeholder": "/mnt/nas/music:/media/music:ro",
+                    "placeholder": {
+                        "en": "/mnt/nas/music:/media/music:ro"
+                    },
                     "hidden": "!data.dockerMusicAssistant?.enabled",
                     "validator": "!data.dockerMusicAssistant?.mediaFolder3 || /^\\/[^:]+:\\/(?!data(?:[\\/:]|$))[^:]+(?::(?:ro|rw))?$/.test(data.dockerMusicAssistant.mediaFolder3)",
                     "validatorErrorText": "Format: /path/on/host:/path/in/container[:ro]",

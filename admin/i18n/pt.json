@@ -21,6 +21,5 @@
     "Run Music Assistant in Docker": "Executar o Music Assistant no Docker",
     "Settings": "Definições",
     "Stop container when instance stops": "Parar o contentor quando a instância parar",
-    "Username": "Nome de utilizador",
-    "/mnt/nas/music:/media/music:ro": "/mnt/nas/music:/media/music:ro"
+    "Username": "Nome de utilizador"
 }
