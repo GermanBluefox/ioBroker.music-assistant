@@ -21,5 +21,6 @@
     "Run Music Assistant in Docker": "在 Docker 中运行 Music Assistant",
     "Settings": "设置",
     "Stop container when instance stops": "实例停止时停止容器",
-    "Username": "用户名"
+    "Username": "用户名",
+    "/mnt/nas/music:/media/music:ro": "/mnt/nas/music:/media/music:ro"
 }

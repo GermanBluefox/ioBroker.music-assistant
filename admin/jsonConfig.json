@@ -55,14 +55,22 @@
                     "text": "credentials_info",
                     "hidden": "!!data.dockerMusicAssistant?.enabled",
                     "newLine": true,
-                    "xs": 12
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
                 },
                 "_dockerCredentialsInfo": {
                     "type": "staticText",
                     "text": "docker_credentials_info",
                     "hidden": "!data.dockerMusicAssistant?.enabled",
                     "newLine": true,
-                    "xs": 12
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
                 },
                 "username": {
                     "type": "text",
@@ -94,7 +102,9 @@
                     "newLine": true,
                     "xs": 12,
                     "sm": 12,
-                    "md": 6
+                    "md": 6,
+                    "lg": 6,
+                    "xl": 6
                 },
                 "dockerMusicAssistant.autoImageUpdate": {
                     "type": "checkbox",
@@ -103,7 +113,9 @@
                     "hidden": "!data.dockerMusicAssistant?.enabled",
                     "xs": 12,
                     "sm": 12,
-                    "md": 6
+                    "md": 6,
+                    "lg": 6,
+                    "xl": 6
                 },
                 "_mediaFoldersHeader": {
                     "type": "header",
@@ -118,7 +130,11 @@
                     "text": "media_folders_info",
                     "hidden": "!data.dockerMusicAssistant?.enabled",
                     "newLine": true,
-                    "xs": 12
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
                 },
                 "dockerMusicAssistant.mediaFolder1": {
                     "type": "text",

@@ -5,7 +5,7 @@
     "news": {
       "0.0.2": {
         "en": "republish to fix the npm release",
-        "de": "republish to fix the npm release",
+        "de": "Veröffentlichung, um das npm-Release zu korrigieren",
         "ru": "переопубликуйте, чтобы исправить выпуск npm",
         "pt": "republicar e corrigir o npm",
         "nl": "opnieuw publiceren om de npm-release te repareren",
