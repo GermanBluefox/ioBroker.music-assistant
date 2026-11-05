@@ -30,6 +30,45 @@ updates:
     cooldown:
       default-days: 7
 
+  - package-ecosystem: npm
+    directory: "/src-devices"
+    schedule:
+      interval: cron
+      cronjob: "41 2 13 * *"
+      timezone: Europe/Berlin
+    open-pull-requests-limit: 15
+    assignees:
+      - NurPech
+    versioning-strategy: increase
+    cooldown:
+      default-days: 7
+
+  - package-ecosystem: npm
+    directory: "/src-webcomponents"
+    schedule:
+      interval: cron
+      cronjob: "41 2 13 * *"
+      timezone: Europe/Berlin
+    open-pull-requests-limit: 15
+    assignees:
+      - NurPech
+    versioning-strategy: increase
+    cooldown:
+      default-days: 7
+
+  - package-ecosystem: npm
+    directory: "/src-widgets"
+    schedule:
+      interval: cron
+      cronjob: "41 2 13 * *"
+      timezone: Europe/Berlin
+    open-pull-requests-limit: 15
+    assignees:
+      - NurPech
+    versioning-strategy: increase
+    cooldown:
+      default-days: 7
+
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
