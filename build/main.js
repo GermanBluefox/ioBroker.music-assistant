@@ -24,6 +24,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 var utils = __toESM(require("@iobroker/adapter-core"));
 var import_ma_client = require("./lib/ma-client");
 var import_objects = require("./lib/objects");
+var import_players = require("./lib/players");
 const DOCKER_PORT = 8095;
 const DOCKER_USED_PORTS = [DOCKER_PORT, 8097];
 const MIN_PASSWORD_LENGTH = 8;
@@ -48,6 +49,7 @@ class MusicAssistant extends utils.Adapter {
     });
     this.on("ready", this.onReady.bind(this));
     this.on("stateChange", this.onStateChange.bind(this));
+    this.on("message", this.onMessage.bind(this));
     this.on("unload", this.onUnload.bind(this));
   }
   async onReady() {
@@ -615,6 +617,30 @@ class MusicAssistant extends utils.Adapter {
       return "refresh";
     }
     return "none";
+  }
+  /**
+   * Messages of the GUIs. `getPlayers` fills the player picker in the settings of the devices widget
+   * (`selectSendTo`): `[{ value: <channel name below players>, label: <player name> }]`.
+   *
+   * @param obj the message
+   */
+  async onMessage(obj) {
+    var _a;
+    if (!(obj == null ? void 0 : obj.command) || !obj.callback) {
+      return;
+    }
+    if (obj.command === "getPlayers") {
+      const prefix = `${this.namespace}.players.`;
+      let result = [];
+      try {
+        const channels = await this.getForeignObjectsAsync(`${prefix}*`, "channel");
+        const lang = ((_a = obj.message) == null ? void 0 : _a.lang) || "en";
+        result = (0, import_players.playerOptions)(channels, prefix, lang);
+      } catch (error) {
+        this.log.warn(`Cannot list the players: ${error.message}`);
+      }
+      this.sendTo(obj.from, obj.command, result, obj.callback);
+    }
   }
   onUnload(callback) {
     var _a;
