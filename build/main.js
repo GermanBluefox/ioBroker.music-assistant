@@ -408,6 +408,7 @@ class MusicAssistant extends utils.Adapter {
       available: !!player.available,
       powered: !!player.powered,
       state: (_a = import_objects.MEDIA_STATE[player.playback_state]) != null ? _a : import_objects.MEDIA_STATE.unknown,
+      playing: player.playback_state === "playing",
       playbackState: player.playback_state,
       volume: (_b = player.volume_level) != null ? _b : 0,
       muted: !!player.volume_muted,
@@ -528,6 +529,11 @@ class MusicAssistant extends utils.Adapter {
     switch (key) {
       case "powered":
         await this.client.sendCommand("players/cmd/power", { player_id: playerId, powered: !!state.val });
+        return "refresh";
+      case "playing":
+        await this.client.sendCommand(state.val ? "players/cmd/play" : "players/cmd/pause", {
+          player_id: playerId
+        });
         return "refresh";
       case "volume":
         await this.client.sendCommand("players/cmd/volume_set", {

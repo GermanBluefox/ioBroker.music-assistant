@@ -38,6 +38,14 @@ export const PLAYER_STATES: Record<string, ioBroker.StateCommon> = {
         write: false,
         states: { 0: 'pause', 1: 'play', 2: 'stop' },
     },
+    playing: {
+        name: 'Playing',
+        desc: 'true while playing. Writing true plays, false pauses - for widgets that expect a boolean play/pause state',
+        type: 'boolean',
+        role: 'switch',
+        read: true,
+        write: true,
+    },
     playbackState: { name: 'Playback state (raw)', type: 'string', role: 'text', read: true, write: false },
     volume: {
         name: 'Volume',

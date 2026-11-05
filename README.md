@@ -114,6 +114,7 @@ For every Music Assistant player, the adapter creates the channel `music-assista
 | State                                                                         | Description                                                        |
 |-------------------------------------------------------------------------------|--------------------------------------------------------------------|
 | `state`                                                                       | `0` = pause, `1` = play, `2` = stop (role `media.state`)           |
+| `playing`                                                                     | `true` while playing; writing `true` plays, `false` pauses (for widgets that expect a boolean) |
 | `playbackState`                                                               | Raw state of Music Assistant: `idle`, `paused`, `playing`          |
 | `available`, `powered`, `name`, `activeSource`, `queueId`                     | Player status (`powered` is writable)                              |
 | `volume` (0-100 %), `muted`                                                   | Writable volume control                                            |
@@ -250,6 +251,7 @@ start/stop the instance manually from the Admin UI instead.
 * (@GermanBluefox) Added the web component `<iob-ma-player>` for vis-2, devices and the other UIs that show web components (`common.webComponents`)
 * (@GermanBluefox) Added native player widgets for vis-2 and for the dashboard of devices, built like the SONOS widgets. They have the name of the web component, so vis-2 and devices show only the native one
 * (@GermanBluefox) Added the message `getPlayers`, which lists the players of the instance
+* (@M1kad0) Added the boolean state `players.<id>.playing` (writable: `true` plays, `false` pauses) for widgets that expect a boolean play/pause state, e.g. the player of vis-2-widgets-material
 
 ### 0.1.0 (2026-11-03)
 * (@GermanBluefox) Added the tab "Players" to the instance settings to see and control the players
