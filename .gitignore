@@ -25,3 +25,14 @@ admin/i18n/*/flat.txt
 src-admin/node_modules/
 src-admin/build/
 src-admin/.__mf__temp/
+# web components: the sources are built with vite and the result in admin/webcomponents/ is committed
+src-webcomponents/node_modules/
+src-webcomponents/build/
+# native vis-2 widgets: built into widgets/music-assistant/, which is committed - see tasks.mts
+src-widgets/node_modules/
+src-widgets/build/
+src-widgets/.__mf__temp/
+# native ioBroker.devices widgets: built into admin/dm-widgets/, which is committed - see tasks.mts
+src-devices/node_modules/
+src-devices/build/
+src-devices/.__mf__temp/

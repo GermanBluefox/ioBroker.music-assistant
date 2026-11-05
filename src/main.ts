@@ -18,6 +18,7 @@ import {
     QUEUE_STATES,
     REPEAT_TO_NUMBER,
 } from './lib/objects';
+import { type PlayerOption, playerOptions } from './lib/players';
 
 /** Port of the web interface and the API of the Music Assistant container (host network mode) */
 const DOCKER_PORT = 8095;
@@ -74,6 +75,7 @@ class MusicAssistant extends utils.Adapter {
         });
         this.on('ready', this.onReady.bind(this));
         this.on('stateChange', this.onStateChange.bind(this));
+        this.on('message', this.onMessage.bind(this));
         this.on('unload', this.onUnload.bind(this));
     }
 
@@ -715,6 +717,30 @@ class MusicAssistant extends utils.Adapter {
             return 'refresh';
         }
         return 'none';
+    }
+
+    /**
+     * Messages of the GUIs. `getPlayers` fills the player picker in the settings of the devices widget
+     * (`selectSendTo`): `[{ value: <channel name below players>, label: <player name> }]`.
+     *
+     * @param obj the message
+     */
+    private async onMessage(obj: ioBroker.Message): Promise<void> {
+        if (!obj?.command || !obj.callback) {
+            return;
+        }
+        if (obj.command === 'getPlayers') {
+            const prefix = `${this.namespace}.players.`;
+            let result: PlayerOption[] = [];
+            try {
+                const channels = await this.getForeignObjectsAsync(`${prefix}*`, 'channel');
+                const lang = (obj.message as { lang?: ioBroker.Languages } | undefined)?.lang || 'en';
+                result = playerOptions(channels, prefix, lang);
+            } catch (error) {
+                this.log.warn(`Cannot list the players: ${(error as Error).message}`);
+            }
+            this.sendTo(obj.from, obj.command, result, obj.callback);
+        }
     }
 
     private onUnload(callback: () => void): void {

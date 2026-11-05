@@ -153,6 +153,75 @@ For every player queue, `music-assistant.0.queues.<queue_id>` gets:
 | `shuffleEnabled`, `repeatMode`                                        | Writable queue settings  |
 | `control.play` / `pause` / `playPause` / `stop` / `next` / `previous` | Writable control buttons |
 
+## Widgets for vis-2 and devices
+
+The player exists as a native widget of vis-2 and of the dashboard of ioBroker.devices, built like the SONOS widgets
+of ioBroker.sonos. Both carry the name of the web component (below), "Music Assistant player". vis-2 and devices then
+show only the native widget in their palette; the web component stays for the UIs without one (Aura, admin) and
+for older versions of vis-2 and devices, which list both.
+
+### vis-2: widget set "Music Assistant"
+
+One widget for all players of an instance: the players are chips on top - a click switches to that player, a playing
+one shows a play icon. Below them the cover, title and artist, the position with a slider to jump within the track,
+previous/play-pause/next, shuffle, repeat, mute and the volume. A player that is off gets a power button.
+
+| Setting                        | Description                                                         |
+|--------------------------------|---------------------------------------------------------------------|
+| Instance                       | the instance of music-assistant                                     |
+| Start player                   | the player shown first, picked from a list; empty: the first player |
+| Without card                   | no card around the widget                                           |
+| Title                          | shown on the card                                                   |
+| Show players                   | the chips to switch the player                                      |
+| Hide unavailable players       | no chip for a player Music Assistant cannot reach                   |
+| Show cover / volume / shuffle… | the parts of the player                                             |
+
+### devices: one player per tile
+
+The tile shows the cover with title, artist and the position; a click on it opens the whole player as a dialog -
+cover, position slider, transport, shuffle, repeat, mute and volume. The tile follows the size set in the dashboard:
+1x1 is the cover with the texts on it, 2x0.5 a row with a small cover on a blurred one, 2x1 and 2x2 the large cover
+with the texts below.
+
+| Setting                    | Description                                                           |
+|----------------------------|-----------------------------------------------------------------------|
+| Instance                   | the instance of music-assistant                                       |
+| Player                     | picked from the players the instance reports (message `getPlayers`)   |
+| Show cover / volume / …    | cover, volume slider, position, shuffle and repeat                    |
+| Icon, Name                 | shown instead of the music note and the name of the player            |
+
+## Web component: `<iob-ma-player>`
+
+The adapter brings a player as a [web component](https://github.com/ioBroker/web-components): one element that
+every ioBroker UI with support for `@iobroker/web-components` shows alike - vis-2, the dashboard of devices, Aura,
+admin. It shows the cover, the title, the artist and the album, the position (also of a stream that has no end),
+play/pause, previous/next, shuffle, repeat, mute and the volume, and a power button for a player that is off.
+
+| Setting                   | Description                                                                         |
+|---------------------------|-------------------------------------------------------------------------------------|
+| Player                    | the channel of the player, `music-assistant.<n>.players.<name>`; any instance works |
+| Name                      | shown instead of the name of the player                                             |
+| Show cover                | the cover beside or above the texts                                                 |
+| Show volume               | the mute button and the volume slider                                               |
+| Show shuffle and repeat   | the two mode buttons                                                                |
+| Accent color              | of the sliders and the active buttons; empty: the color of the text                 |
+
+The element takes the colors and the font of the page it is shown in. It measures its box and arranges itself by it,
+also while the box is resized:
+
+| Box                         | Layout                                                                      |
+|-----------------------------|-----------------------------------------------------------------------------|
+| wide (about 3:2 and wider)  | the cover on the left, beside it the texts and all controls                 |
+| about square                | a small cover beside the texts, below them the position, buttons and volume |
+| tall (narrower than 4:5)    | the cover on top, everything else below it                                  |
+| low (under 120 px)          | one row: cover, texts, previous/play/next                                   |
+
+Icons, cover and fonts grow and shrink with the box. What does not fit is left out: in a narrow box first shuffle and
+repeat, then "previous"; in a low box first the position, then the volume. The title takes two lines where there is
+room for them.
+
+The element writes the states of the player channel only - the adapter sends the commands to Music Assistant.
+
 ## For developers
 
 ```bash
@@ -161,6 +230,10 @@ npm run build   # compile TypeScript
 npm run test    # type-check + package tests
 npm run lint    # ESLint
 npm run build:admin  # build the "Players" tab (src-admin/ -> admin/custom/, commit the result)
+npm run build:wc     # build the web component (src-webcomponents/ -> admin/webcomponents/, commit the result)
+npm run build:widgets  # build the vis-2 widgets (src-widgets/ -> widgets/music-assistant/, commit the result)
+npm run build:devices  # build the devices widgets (src-devices/ -> admin/dm-widgets/, commit the result)
+npm run build:gui      # all four of them
 dev-server run  # run against a local test ioBroker instance (see README note below)
 ```
 
@@ -173,6 +246,11 @@ start/stop the instance manually from the Admin UI instead.
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+* (@GermanBluefox) Added the web component `<iob-ma-player>` for vis-2, devices and the other UIs that show web components (`common.webComponents`)
+* (@GermanBluefox) Added native player widgets for vis-2 and for the dashboard of devices, built like the SONOS widgets. They have the name of the web component, so vis-2 and devices show only the native one
+* (@GermanBluefox) Added the message `getPlayers`, which lists the players of the instance
+
 ### 0.1.0 (2026-11-03)
 * (@GermanBluefox) Added the tab "Players" to the instance settings to see and control the players
 * (@GermanBluefox) Breaking change: the buttons of a player moved from `players.<id>.control.*` directly into `players.<id>` and got the roles `button.play`, `button.pause`, ... The old `control` channel is deleted on the first start

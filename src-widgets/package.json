@@ -1,0 +1,35 @@
+{
+    "name": "iobroker.music-assistant-widgets",
+    "private": true,
+    "version": "0.1.0",
+    "type": "module",
+    "dependencies": {
+        "@iobroker/types-vis-2": "~2.20.6",
+        "@module-federation/vite": "^1.23.9",
+        "@vitejs/plugin-react": "^6.2.1"
+    },
+    "devDependencies": {
+        "@emotion/react": "^11.14.0",
+        "@emotion/styled": "^11.14.1",
+        "@mui/icons-material": "^9.5.0",
+        "@mui/material": "^9.5.0",
+        "@types/react": "^19.3.0",
+        "@types/react-dom": "^19.3.0",
+        "react": "^19.3.1",
+        "react-dom": "^19.3.1",
+        "vite": "^8.3.5"
+    },
+    "scripts": {
+        "start": "vite --port 4173",
+        "build": "tsc && vite build",
+        "check-ts": "tsc --noEmit",
+        "lint": "eslint -c eslint.config.mjs src"
+    },
+    "homepage": ".",
+    "browserslist": [
+        ">0.2%",
+        "not dead",
+        "not ie <= 11",
+        "not op_mini all"
+    ]
+}

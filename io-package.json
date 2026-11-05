@@ -99,6 +99,61 @@
     "adminUI": {
       "config": "json"
     },
+    "messagebox": true,
+    "webComponents": [
+      "webcomponents/ma-player.json"
+    ],
+    "visWidgets": {
+      "vis2MusicAssistantWidgets": {
+        "i18n": "component",
+        "name": "vis2MusicAssistantWidgets",
+        "url": "music-assistant/customWidgets.js",
+        "bundlerType": "module",
+        "components": [
+          "MaPlayer"
+        ]
+      }
+    },
+    "deviceWidgets": {
+      "components": [
+        {
+          "name": "MaPlayerComponent",
+          "label": {
+            "en": "Music Assistant player",
+            "de": "Music-Assistant-Player",
+            "ru": "Плеер Music Assistant",
+            "pt": "Leitor Music Assistant",
+            "nl": "Music Assistant-speler",
+            "fr": "Lecteur Music Assistant",
+            "it": "Lettore Music Assistant",
+            "es": "Reproductor de Music Assistant",
+            "pl": "Odtwarzacz Music Assistant",
+            "uk": "Плеєр Music Assistant",
+            "zh-cn": "Music Assistant 播放器"
+          },
+          "description": {
+            "en": "Cover, title and controls of a Music Assistant player",
+            "de": "Cover, Titel und Bedienung eines Music-Assistant-Players",
+            "ru": "Обложка, название и управление плеером Music Assistant",
+            "pt": "Capa, título e controles de um leitor do Music Assistant",
+            "nl": "Albumhoes, titel en bediening van een Music Assistant-speler",
+            "fr": "Pochette, titre et commandes d'un lecteur Music Assistant",
+            "it": "Copertina, titolo e comandi di un lettore Music Assistant",
+            "es": "Portada, título y controles de un reproductor de Music Assistant",
+            "pl": "Okładka, tytuł i sterowanie odtwarzaczem Music Assistant",
+            "uk": "Обкладинка, назва та керування плеєром Music Assistant",
+            "zh-cn": "Music Assistant 播放器的封面、标题和控制"
+          },
+          "icon": "player.png"
+        }
+      ]
+    },
+    "restartAdapters": [
+      "vis-2"
+    ],
+    "ifInstalledDependencies": {
+      "vis-2": ">=2.12.8"
+    },
     "plugins": {
       "docker": {
         "iobDockerComposeFiles": [
