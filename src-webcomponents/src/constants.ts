@@ -26,11 +26,22 @@ export const PLAYER_STATES = [
     'mediaArtist',
     'mediaAlbum',
     'mediaImage',
+    'source',
 ] as const;
 
 /** The states the player writes - buttons, levels and switches of the player channel */
 export type PlayerCommand =
-    'playPause' | 'next' | 'previous' | 'volume' | 'muted' | 'shuffle' | 'repeat' | 'seek' | 'powered';
+    | 'playPause'
+    | 'next'
+    | 'previous'
+    | 'volume'
+    | 'muted'
+    | 'shuffle'
+    | 'repeat'
+    | 'seek'
+    | 'powered'
+    | 'source'
+    | 'playMedia';
 
 /** The values of the settings of the manifest; a setting without a value is missing */
 export type PlayerSettings = {
@@ -39,6 +50,8 @@ export type PlayerSettings = {
     showCover?: boolean;
     showVolume?: boolean;
     showModes?: boolean;
+    showSource?: boolean;
+    showLibrary?: boolean;
     accent?: string;
 };
 

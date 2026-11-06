@@ -148,6 +148,66 @@
                     "zh-cn": "显示随机和重复"
                 }
             },
+            "showSource": {
+                "type": "checkbox",
+                "default": true,
+                "label": {
+                    "en": "Show source selection",
+                    "de": "Quellenauswahl anzeigen",
+                    "ru": "Показывать выбор источника",
+                    "pt": "Mostrar seleção de fonte",
+                    "nl": "Bronkeuze tonen",
+                    "fr": "Afficher le choix de la source",
+                    "it": "Mostra selezione sorgente",
+                    "es": "Mostrar selección de fuente",
+                    "pl": "Pokaż wybór źródła",
+                    "uk": "Показувати вибір джерела",
+                    "zh-cn": "显示音源选择"
+                },
+                "help": {
+                    "en": "After the name, if the player has native sources such as Spotify Connect or AirPlay",
+                    "de": "Nach dem Namen, wenn der Player eigene Quellen wie Spotify Connect oder AirPlay hat",
+                    "ru": "После названия, если у плеера есть собственные источники, например Spotify Connect или AirPlay",
+                    "pt": "Após o nome, se o leitor tiver fontes próprias como Spotify Connect ou AirPlay",
+                    "nl": "Na de naam, als de speler eigen bronnen heeft zoals Spotify Connect of AirPlay",
+                    "fr": "Après le nom, si le lecteur a ses propres sources comme Spotify Connect ou AirPlay",
+                    "it": "Dopo il nome, se il lettore ha sorgenti proprie come Spotify Connect o AirPlay",
+                    "es": "Tras el nombre, si el reproductor tiene fuentes propias como Spotify Connect o AirPlay",
+                    "pl": "Po nazwie, jeśli odtwarzacz ma własne źródła, np. Spotify Connect lub AirPlay",
+                    "uk": "Після назви, якщо плеєр має власні джерела, наприклад Spotify Connect або AirPlay",
+                    "zh-cn": "显示在名称后面，如果播放器有自己的音源，例如 Spotify Connect 或 AirPlay"
+                }
+            },
+            "showLibrary": {
+                "type": "checkbox",
+                "default": true,
+                "label": {
+                    "en": "Show library",
+                    "de": "Bibliothek anzeigen",
+                    "ru": "Показывать библиотеку",
+                    "pt": "Mostrar biblioteca",
+                    "nl": "Bibliotheek tonen",
+                    "fr": "Afficher la bibliothèque",
+                    "it": "Mostra libreria",
+                    "es": "Mostrar biblioteca",
+                    "pl": "Pokaż bibliotekę",
+                    "uk": "Показувати бібліотеку",
+                    "zh-cn": "显示媒体库"
+                },
+                "help": {
+                    "en": "A button after the name: favorites, playlists and radio stations of Music Assistant to play",
+                    "de": "Eine Taste nach dem Namen: Favoriten, Playlists und Radiosender von Music Assistant zum Abspielen",
+                    "ru": "Кнопка после названия: избранное, плейлисты и радиостанции Music Assistant для воспроизведения",
+                    "pt": "Um botão após o nome: favoritos, playlists e rádios do Music Assistant para reproduzir",
+                    "nl": "Een knop na de naam: favorieten, afspeellijsten en radiozenders van Music Assistant om af te spelen",
+                    "fr": "Un bouton après le nom : favoris, playlists et radios de Music Assistant à lire",
+                    "it": "Un pulsante dopo il nome: preferiti, playlist e radio di Music Assistant da riprodurre",
+                    "es": "Un botón tras el nombre: favoritos, listas y radios de Music Assistant para reproducir",
+                    "pl": "Przycisk po nazwie: ulubione, playlisty i stacje radiowe Music Assistant do odtworzenia",
+                    "uk": "Кнопка після назви: обране, плейлисти та радіостанції Music Assistant для відтворення",
+                    "zh-cn": "名称后的按钮：播放 Music Assistant 的收藏、播放列表和电台"
+                }
+            },
             "accent": {
                 "type": "color",
                 "label": {

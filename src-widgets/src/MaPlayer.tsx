@@ -1,7 +1,9 @@
 import React from 'react';
 
-import { Chip, IconButton, LinearProgress, Slider, Tooltip, Typography } from '@mui/material';
+import { Chip, IconButton, LinearProgress, MenuItem, Select, Slider, Tooltip, Typography } from '@mui/material';
 import {
+    InputRounded,
+    LibraryMusic,
     MusicNote,
     PauseRounded,
     PlayArrowRounded,
@@ -18,8 +20,19 @@ import {
 import type { RxRenderWidgetProps, RxWidgetInfo, VisRxWidgetProps, VisRxWidgetState } from '@iobroker/types-vis-2';
 
 import CoverBox from './CoverBox';
-import Generic, { CHIP_STATES, PLAYER_STATES, type MaPlayerInfo, type PlayerStateName } from './Generic';
+import Generic, {
+    CHIP_STATES,
+    getSources,
+    PLAYER_STATES,
+    type MaPlayerInfo,
+    type MaSource,
+    type PlayerStateName,
+} from './Generic';
+import LibraryDialog, { type LibraryAnswer, type LibraryList } from './LibraryDialog';
 import { playerField } from './PlayerField';
+
+/** How long the instance may take for the list of the library */
+const LIBRARY_TIMEOUT = 15000;
 
 const styles: Record<string, React.CSSProperties> = {
     root: { display: 'flex', flexDirection: 'column', gap: 8, width: '100%', height: '100%', minHeight: 0 },
@@ -37,7 +50,17 @@ const styles: Record<string, React.CSSProperties> = {
         justifyContent: 'center',
     },
     meta: { display: 'flex', flexDirection: 'column', gap: 4, flex: 1, minWidth: 0 },
-    title: { fontSize: '130%', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
+    titleRow: { display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 },
+    title: {
+        flex: 1,
+        minWidth: 0,
+        fontSize: '130%',
+        fontWeight: 500,
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+    },
+    source: { flex: '0 1 auto', minWidth: 0, maxWidth: '45%', fontSize: '85%' },
     sub: { opacity: 0.7, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
     buttons: { display: 'flex', alignItems: 'center', flexWrap: 'wrap' },
     seek: { display: 'flex', alignItems: 'center', gap: 8 },
@@ -59,6 +82,8 @@ interface MaPlayerRxData {
     showCover: boolean;
     showVolume: boolean;
     showModes: boolean;
+    showSource: boolean;
+    showLibrary: boolean;
 }
 
 interface MaPlayerState extends VisRxWidgetState {
@@ -74,6 +99,12 @@ interface MaPlayerState extends VisRxWidgetState {
     localSeek: number | null;
     /** Ticks every second while the player plays: the adapter writes the elapsed time only now and then */
     now: number;
+    /** The sources of the selected player, from `common.states` of its `source` state */
+    sources: MaSource[];
+    /** The source the user picked, shown until the state follows: `was` is the value of the state then */
+    pickedSource: { id: string; was: string } | null;
+    /** The dialog with the library of Music Assistant */
+    libraryOpen: boolean;
 }
 
 export default class MaPlayer extends Generic<MaPlayerRxData, MaPlayerState> {
@@ -84,6 +115,11 @@ export default class MaPlayer extends Generic<MaPlayerRxData, MaPlayerState> {
     private seekTimer: ReturnType<typeof setTimeout> | null = null;
 
     private clock: ReturnType<typeof setInterval> | null = null;
+
+    private sourceTimer: ReturnType<typeof setTimeout> | null = null;
+
+    /** The object `players.<id>.source` of the selected player, subscribed for the list of its sources */
+    private sourceObjectId = '';
 
     constructor(props: VisRxWidgetProps) {
         super(props);
@@ -96,6 +132,9 @@ export default class MaPlayer extends Generic<MaPlayerRxData, MaPlayerState> {
             localVolume: null,
             localSeek: null,
             now: Date.now(),
+            sources: [],
+            pickedSource: null,
+            libraryOpen: false,
         };
     }
 
@@ -147,6 +186,8 @@ export default class MaPlayer extends Generic<MaPlayerRxData, MaPlayerState> {
                         { name: 'showCover', type: 'checkbox', default: true, label: 'show_cover' },
                         { name: 'showVolume', type: 'checkbox', default: true, label: 'show_volume' },
                         { name: 'showModes', type: 'checkbox', default: true, label: 'show_modes' },
+                        { name: 'showSource', type: 'checkbox', default: true, label: 'show_source' },
+                        { name: 'showLibrary', type: 'checkbox', default: true, label: 'show_library' },
                     ],
                 },
             ],
@@ -170,18 +211,20 @@ export default class MaPlayer extends Generic<MaPlayerRxData, MaPlayerState> {
     }
 
     componentWillUnmount(): void {
-        for (const timer of [this.volumeTimer, this.seekTimer]) {
+        for (const timer of [this.volumeTimer, this.seekTimer, this.sourceTimer]) {
             if (timer) {
                 clearTimeout(timer);
             }
         }
         this.volumeTimer = null;
         this.seekTimer = null;
+        this.sourceTimer = null;
         if (this.clock) {
             clearInterval(this.clock);
             this.clock = null;
         }
         this.unsubscribeAll();
+        this.unsubscribeSource();
         super.componentWillUnmount();
     }
 
@@ -191,6 +234,8 @@ export default class MaPlayer extends Generic<MaPlayerRxData, MaPlayerState> {
             await this.refreshPlayers();
         } else if (prevRxData.defaultPlayer !== this.state.rxData.defaultPlayer) {
             await this.refreshPlayers(true);
+        } else if (prevRxData.showSource !== this.state.rxData.showSource) {
+            this.resubscribeSource();
         }
     }
 
@@ -245,7 +290,44 @@ export default class MaPlayer extends Generic<MaPlayerRxData, MaPlayerState> {
         }
     }
 
+    private onSourceObject = (id: string, obj: ioBroker.Object | null | undefined): void => {
+        if (id === this.sourceObjectId) {
+            this.setState({ sources: getSources(obj) });
+        }
+    };
+
+    private unsubscribeSource(): void {
+        if (this.sourceObjectId) {
+            const id = this.sourceObjectId;
+            this.sourceObjectId = '';
+            this.props.context.socket.unsubscribeObject(id, this.onSourceObject).catch(() => {});
+        }
+    }
+
+    /** Reads the sources of the selected player and keeps them up to date - only if they are shown */
+    private resubscribeSource(): void {
+        const selected = this.state.selectedPlayer;
+        const id = selected && this.state.rxData.showSource !== false ? this.getPlayerStateId(selected, 'source') : '';
+        if (id === this.sourceObjectId) {
+            return;
+        }
+        this.unsubscribeSource();
+        this.setState({ sources: [], pickedSource: null });
+        if (!id) {
+            return;
+        }
+        this.sourceObjectId = id;
+        const socket = this.props.context.socket;
+        socket
+            .getObject(id)
+            .then((obj: ioBroker.Object | null | undefined) => this.onSourceObject(id, obj))
+            // the player may have changed meanwhile
+            .then(() => (this.sourceObjectId === id ? socket.subscribeObject(id, this.onSourceObject) : undefined))
+            .catch((e: unknown) => console.warn(`Cannot read the sources of ${id}: ${e as string}`));
+    }
+
     private resubscribe(): void {
+        this.resubscribeSource();
         const wanted = this.wantedIds();
         if (wanted.length === this.subscribed.length && wanted.every(id => this.subscribed.includes(id))) {
             return;
@@ -342,6 +424,33 @@ export default class MaPlayer extends Generic<MaPlayerRxData, MaPlayerState> {
             this.setState({ localVolume: null });
         }, 200);
     }
+
+    private onSourceChange(player: string, id: string): void {
+        if (this.sourceTimer) {
+            clearTimeout(this.sourceTimer);
+        }
+        this.setState({ pickedSource: { id, was: this.str(player, 'source') } });
+        this.set(player, 'source', id);
+        // a source the player refuses: show the real one again
+        this.sourceTimer = setTimeout(() => {
+            this.sourceTimer = null;
+            this.setState({ pickedSource: null });
+        }, 5000);
+    }
+
+    /** Asks the instance for a list of the library, see `getMedia` in src/main.ts */
+    private loadLibrary = (list: LibraryList, search: string): Promise<LibraryAnswer> => {
+        let timer: ReturnType<typeof setTimeout> | undefined;
+        const timeout = new Promise<LibraryAnswer>((_resolve, reject) => {
+            timer = setTimeout(() => reject(new Error(MaPlayer.t('library_error'))), LIBRARY_TIMEOUT);
+        });
+        const answer = this.props.context.socket.sendTo(this.getNamespace(), 'getMedia', {
+            list,
+            search,
+            limit: 200,
+        }) as Promise<LibraryAnswer>;
+        return Promise.race([answer, timeout]).finally(() => clearTimeout(timer));
+    };
 
     private onSeekChange(player: string, value: number, commit: boolean): void {
         if (this.seekTimer) {
@@ -479,6 +588,84 @@ export default class MaPlayer extends Generic<MaPlayerRxData, MaPlayerState> {
         );
     }
 
+    /** The source of the player as a small list after the title - if it has more than its own queue */
+    private renderSource(player: string): React.JSX.Element | null {
+        const sources = this.state.sources;
+        if (this.state.rxData.showSource === false || sources.length < 2 || !this.available(player)) {
+            return null;
+        }
+        const value = this.str(player, 'source');
+        const picked = this.state.pickedSource;
+        // the state has moved on: show it
+        const shown = picked && picked.was === value ? picked.id : value;
+        // an active source the adapter has not named yet is shown with its ID
+        const options = sources.some(s => s.id === shown) ? sources : [...sources, { id: shown, name: shown }];
+
+        return (
+            <Select
+                variant="standard"
+                size="small"
+                disableUnderline
+                value={shown}
+                title={MaPlayer.t('source')}
+                style={styles.source}
+                onChange={e => this.onSourceChange(player, String(e.target.value))}
+                renderValue={id => (
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0 }}>
+                        <InputRounded style={{ fontSize: '1.1em', flex: 'none' }} />
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {options.find(s => s.id === id)?.name || id}
+                        </span>
+                    </span>
+                )}
+            >
+                {options.map(source => (
+                    <MenuItem
+                        key={source.id}
+                        value={source.id}
+                    >
+                        {source.name}
+                    </MenuItem>
+                ))}
+            </Select>
+        );
+    }
+
+    /** The button of the library after the title */
+    private renderLibraryButton(): React.JSX.Element | null {
+        if (this.state.rxData.showLibrary === false) {
+            return null;
+        }
+        return (
+            <Tooltip title={MaPlayer.t('library')}>
+                <IconButton
+                    size="small"
+                    edge="end"
+                    onClick={() => this.setState({ libraryOpen: true })}
+                >
+                    <LibraryMusic fontSize="small" />
+                </IconButton>
+            </Tooltip>
+        );
+    }
+
+    private renderLibrary(player: string): React.JSX.Element | null {
+        if (!this.state.libraryOpen) {
+            return null;
+        }
+        return (
+            <LibraryDialog
+                load={this.loadLibrary}
+                t={key => MaPlayer.t(key)}
+                onPick={uri => {
+                    this.set(player, 'playMedia', uri);
+                    this.setState({ libraryOpen: false });
+                }}
+                onClose={() => this.setState({ libraryOpen: false })}
+            />
+        );
+    }
+
     private renderSeek(player: string): React.JSX.Element | null {
         const duration = this.num(player, 'duration');
         if (duration <= 0 || !this.powered(player)) {
@@ -575,13 +762,18 @@ export default class MaPlayer extends Generic<MaPlayerRxData, MaPlayerState> {
                         </CoverBox>
                     ) : null}
                     <div style={{ ...styles.meta, pointerEvents: available ? undefined : 'none' }}>
-                        <div style={styles.title}>{title}</div>
+                        <div style={styles.titleRow}>
+                            <div style={styles.title}>{title}</div>
+                            {this.renderSource(player)}
+                            {this.renderLibraryButton()}
+                        </div>
                         <div style={styles.sub}>{sub}</div>
                         {this.renderTransport(player)}
                         {this.renderSeek(player)}
                         {this.renderVolume(player)}
                     </div>
                 </div>
+                {this.renderLibrary(player)}
             </div>
         );
 

@@ -23,11 +23,13 @@ __export(objects_exports, {
   PLAYER_BUTTONS: () => PLAYER_BUTTONS,
   PLAYER_STATES: () => PLAYER_STATES,
   QUEUE_BUTTONS: () => QUEUE_BUTTONS,
+  QUEUE_SOURCE_NAME: () => QUEUE_SOURCE_NAME,
   QUEUE_STATES: () => QUEUE_STATES,
   REPEAT_TO_NUMBER: () => REPEAT_TO_NUMBER,
   defaultValue: () => defaultValue,
   parsePlayMedia: () => parsePlayMedia,
-  pickSearchResult: () => pickSearchResult
+  pickSearchResult: () => pickSearchResult,
+  sourceStates: () => sourceStates
 });
 module.exports = __toCommonJS(objects_exports);
 const MEDIA_STATE = { paused: 0, playing: 1, idle: 2, unknown: 2 };
@@ -68,6 +70,14 @@ const PLAYER_STATES = {
     states: { 0: "off", 1: "all", 2: "one" }
   },
   activeSource: { name: "Active source", type: "string", role: "text", read: true, write: false },
+  source: {
+    name: "Source",
+    desc: "The source the player plays: its own queue of Music Assistant or a native source (common.states)",
+    type: "string",
+    role: "media.input",
+    read: true,
+    write: true
+  },
   queueId: { name: "Queue ID", type: "string", role: "text", read: true, write: false },
   elapsedTime: { name: "Elapsed time", type: "number", role: "media.elapsed", unit: "s", read: true, write: false },
   duration: { name: "Duration", type: "number", role: "media.duration", unit: "s", read: true, write: false },
@@ -120,6 +130,22 @@ const QUEUE_BUTTONS = {
 };
 function defaultValue(common) {
   return common.type === "boolean" ? false : common.type === "number" ? 0 : "";
+}
+const QUEUE_SOURCE_NAME = "Music Assistant";
+function sourceStates(player, playerName) {
+  var _a, _b;
+  const states = { [player.player_id]: QUEUE_SOURCE_NAME };
+  for (const source of (_a = player.source_list) != null ? _a : []) {
+    if ((source == null ? void 0 : source.id) && !source.passive && !states[source.id]) {
+      states[source.id] = source.name || source.id;
+    }
+  }
+  const active = player.active_source;
+  if (active && !states[active]) {
+    const source = (_b = player.source_list) == null ? void 0 : _b.find((s) => (s == null ? void 0 : s.id) === active);
+    states[active] = (source == null ? void 0 : source.name) || playerName(active) || active;
+  }
+  return states;
 }
 const SEARCH_PREFIXES = {
   artist: "artists",
@@ -193,10 +219,12 @@ function pickSearchResult(results, query, mediaType) {
   PLAYER_BUTTONS,
   PLAYER_STATES,
   QUEUE_BUTTONS,
+  QUEUE_SOURCE_NAME,
   QUEUE_STATES,
   REPEAT_TO_NUMBER,
   defaultValue,
   parsePlayMedia,
-  pickSearchResult
+  pickSearchResult,
+  sourceStates
 });
 //# sourceMappingURL=objects.js.map

@@ -13,6 +13,8 @@
 //     music-assistant.<instance>.players.<player>.seek          number   seconds
 //     music-assistant.<instance>.players.<player>.powered       boolean  on/off
 //     music-assistant.<instance>.players.<player>.available     boolean  player reachable
+//     music-assistant.<instance>.players.<player>.source        string   active source; common.states lists them
+//     music-assistant.<instance>.players.<player>.playMedia     string   URI to play, from the library (`getMedia`)
 //     music-assistant.<instance>.players.<player>.media*        playback information
 //
 // The settings dialog fills the player picker from the `getPlayers` message of the adapter.
@@ -27,7 +29,16 @@ import WidgetGeneric, {
     type WidgetGenericState,
     type CustomWidgetPlugin,
 } from '@iobroker/dm-widgets';
-import type { BoxProps, DialogProps, SliderProps, Theme, TooltipProps, TypographyProps } from '@mui/material';
+import type {
+    BoxProps,
+    DialogProps,
+    MenuItemProps,
+    SelectProps,
+    SliderProps,
+    Theme,
+    TooltipProps,
+    TypographyProps,
+} from '@mui/material';
 // `WidgetGeneric.getConfigSchema()` declares its return through dm-utils' copy of these types, so
 // the override signature has to use the same source, while the schema literal is authored against
 // the richer json-config types - hence the second import plus one cast at the return.
@@ -35,9 +46,12 @@ import type { ConfigItemPanel, ConfigItemTabs } from '@iobroker/dm-utils';
 import type { ConfigItemPanel as JsonConfigItemPanel } from '@iobroker/json-config';
 import type { I18n as I18nType, Icon as IconType } from '@iobroker/gui-components';
 
-import { stateId, timeString } from './utils';
+import { getSources, stateId, timeString, type MaSource } from './utils';
+import { LibraryPanel, type LibraryAnswer, type LibraryList } from './LibraryPanel';
 import {
+    BackIcon,
     CollapseIcon,
+    LibraryIcon,
     MA_BLUE,
     MusicIcon,
     MutedIcon,
@@ -47,6 +61,7 @@ import {
     PowerIcon,
     PrevIcon,
     RepeatIcon,
+    SourceIcon,
     RepeatOneIcon,
     ShuffleIcon,
     VolumeIcon,
@@ -59,6 +74,8 @@ const Typography: React.ComponentType<TypographyProps> = MuiMaterial?.Typography
 const Slider: React.ComponentType<SliderProps> = MuiMaterial?.Slider;
 const Tooltip: React.ComponentType<TooltipProps> = MuiMaterial?.Tooltip;
 const Dialog: React.ComponentType<DialogProps> = MuiMaterial?.Dialog;
+const Select: React.ComponentType<SelectProps<string>> = MuiMaterial?.Select;
+const MenuItem: React.ComponentType<MenuItemProps> = MuiMaterial?.MenuItem;
 const I18n = AdapterReact.I18n as typeof I18nType;
 const Icon = AdapterReact.Icon as typeof IconType;
 
@@ -76,6 +93,7 @@ const STATES = [
     'powered',
     'repeat',
     'shuffle',
+    'source',
     'state',
     'volume',
 ] as const;
@@ -86,6 +104,12 @@ type StateName = (typeof STATES)[number];
 const REPEAT_TITLES = ['madm_repeat', 'madm_repeat_all', 'madm_repeat_one'];
 
 const DEFAULT_INSTANCE = 'music-assistant.0';
+
+/** Translates a key of the widget, for the library panel */
+const translate = (key: string): string => I18n.t(key);
+
+/** How long the instance may take for the list of the library */
+const LIBRARY_TIMEOUT = 15000;
 
 interface MaPlayerSettings extends CustomWidgetPlugin {
     /** Adapter instance, e.g. `music-assistant.0` */
@@ -100,6 +124,10 @@ interface MaPlayerSettings extends CustomWidgetPlugin {
     showSeek?: boolean;
     /** Show shuffle and repeat next to the transport buttons */
     showModes?: boolean;
+    /** Show the choice of the source in the player, if the player has more than its own queue */
+    showSource?: boolean;
+    /** Show the button of the library of Music Assistant in the player */
+    showLibrary?: boolean;
 }
 
 interface MaPlayerComponentState extends WidgetGenericState {
@@ -117,6 +145,12 @@ interface MaPlayerComponentState extends WidgetGenericState {
     playerOpen: boolean;
     /** Cover URL that did not load (404, or http on an https page) - the placeholder is drawn instead */
     brokenCover: string;
+    /** The sources of the player, from `common.states` of its `source` state */
+    sources: MaSource[];
+    /** The source the user picked, shown until the state follows: `was` is the value of the state then */
+    pickedSource: { id: string; was: string } | null;
+    /** The player dialog shows the library instead of the player */
+    libraryOpen: boolean;
 }
 
 interface ButtonOptions {
@@ -150,6 +184,12 @@ export class MaPlayerComponent extends WidgetGeneric<MaPlayerComponentState, MaP
     /** Lets the elapsed time run on between two updates of the adapter */
     private clock: ReturnType<typeof setInterval> | null = null;
 
+    /** Shows the real source again if the player does not take the picked one */
+    private sourceTimer: ReturnType<typeof setTimeout> | null = null;
+
+    /** The object `players.<id>.source`, subscribed for the list of the sources */
+    private sourceObjectId = '';
+
     /** Loads the cover a second time to notice a URL that does not load, see `checkCover` */
     private coverProbe: HTMLImageElement | null = null;
 
@@ -167,6 +207,9 @@ export class MaPlayerComponent extends WidgetGeneric<MaPlayerComponentState, MaP
             localSeek: null,
             playerOpen: false,
             brokenCover: '',
+            sources: [],
+            pickedSource: null,
+            libraryOpen: false,
         };
     }
 
@@ -215,6 +258,18 @@ export class MaPlayerComponent extends WidgetGeneric<MaPlayerComponentState, MaP
                     default: true,
                     sm: 6,
                 },
+                showSource: {
+                    type: 'checkbox',
+                    label: 'madm_show_source',
+                    default: true,
+                    sm: 6,
+                },
+                showLibrary: {
+                    type: 'checkbox',
+                    label: 'madm_show_library',
+                    default: true,
+                    sm: 6,
+                },
                 icon: {
                     type: 'component',
                     subType: 'iconSelect',
@@ -243,6 +298,7 @@ export class MaPlayerComponent extends WidgetGeneric<MaPlayerComponentState, MaP
     componentDidMount(): void {
         super.componentDidMount?.();
         this.subscribeStates();
+        this.subscribeSource();
         this.clock = setInterval(() => {
             if (this.playing) {
                 this.setState({ now: Date.now() });
@@ -264,23 +320,29 @@ export class MaPlayerComponent extends WidgetGeneric<MaPlayerComponentState, MaP
                 this.subscribeStates(),
             );
         }
+        // the ID only changes with the player or the setting: no loop of updates
+        if (this.wantedSourceObjectId() !== this.sourceObjectId) {
+            this.subscribeSource();
+        }
     }
 
     componentWillUnmount(): void {
         super.componentWillUnmount?.();
         this.unsubscribeStates();
+        this.unsubscribeSource();
         if (this.coverProbe) {
             this.coverProbe.onload = null;
             this.coverProbe.onerror = null;
             this.coverProbe = null;
         }
-        for (const timer of [this.volumeTimer, this.seekTimer]) {
+        for (const timer of [this.volumeTimer, this.seekTimer, this.sourceTimer]) {
             if (timer) {
                 clearTimeout(timer);
             }
         }
         this.volumeTimer = null;
         this.seekTimer = null;
+        this.sourceTimer = null;
         if (this.clock) {
             clearInterval(this.clock);
             this.clock = null;
@@ -312,6 +374,51 @@ export class MaPlayerComponent extends WidgetGeneric<MaPlayerComponentState, MaP
             context.removeState(id, handler);
         }
         this.subscribed = [];
+    }
+
+    /** The object with the sources of the player - none if they are not shown */
+    private wantedSourceObjectId(): string {
+        return this.player && this.props.settings.showSource !== false
+            ? stateId(this.instance, this.player, 'source')
+            : '';
+    }
+
+    private onSourceObject = (id: string, obj: ioBroker.Object | null | undefined): void => {
+        if (id === this.sourceObjectId) {
+            this.setState({ sources: getSources(obj) });
+        }
+    };
+
+    private unsubscribeSource(): void {
+        if (this.sourceObjectId) {
+            const id = this.sourceObjectId;
+            this.sourceObjectId = '';
+            this.props.stateContext
+                .getSocket()
+                .unsubscribeObject(id, this.onSourceObject)
+                .catch(() => {});
+        }
+    }
+
+    /**
+     * Reads the sources of the player and keeps them up to date. Through the socket, not `getObjectProperty` of
+     * the host: that one keeps one listener per object, and two tiles may show the same player.
+     */
+    private subscribeSource(): void {
+        this.unsubscribeSource();
+        const id = this.wantedSourceObjectId();
+        this.setState({ sources: [], pickedSource: null });
+        if (!id) {
+            return;
+        }
+        this.sourceObjectId = id;
+        const socket = this.props.stateContext.getSocket();
+        socket
+            .getObject(id)
+            .then(obj => this.onSourceObject(id, obj))
+            // the player may have changed meanwhile
+            .then(() => (this.sourceObjectId === id ? socket.subscribeObject(id, this.onSourceObject) : undefined))
+            .catch((e: unknown) => console.warn(`Cannot read the sources of ${id}: ${e as string}`));
     }
 
     // ---- state access -------------------------------------------------------
@@ -464,7 +571,24 @@ export class MaPlayerComponent extends WidgetGeneric<MaPlayerComponentState, MaP
         }
     };
 
-    private closePlayer = (): void => this.setState({ playerOpen: false });
+    private closePlayer = (): void => this.setState({ playerOpen: false, libraryOpen: false });
+
+    /** Asks the instance for a list of the library, see `getMedia` in src/main.ts */
+    private loadLibrary = (list: LibraryList, search: string): Promise<LibraryAnswer> => {
+        let timer: ReturnType<typeof setTimeout> | undefined;
+        const timeout = new Promise<LibraryAnswer>((_resolve, reject) => {
+            timer = setTimeout(() => reject(new Error(I18n.t('madm_library_error'))), LIBRARY_TIMEOUT);
+        });
+        const answer = this.props.stateContext
+            .getSocket()
+            .sendTo<LibraryAnswer>(this.instance, 'getMedia', { list, search, limit: 200 });
+        return Promise.race([answer, timeout]).finally(() => clearTimeout(timer));
+    };
+
+    private onLibraryPick = (uri: string): void => {
+        this.set('playMedia', uri);
+        this.setState({ libraryOpen: false });
+    };
 
     /** The value is written 200 ms after the last move, so dragging does not flood the player */
     private onVolumeChange(value: number): void {
@@ -477,6 +601,18 @@ export class MaPlayerComponent extends WidgetGeneric<MaPlayerComponentState, MaP
             this.set('volume', value);
             this.setState({ localVolume: null });
         }, 200);
+    }
+
+    private onSourceChange(id: string): void {
+        if (this.sourceTimer) {
+            clearTimeout(this.sourceTimer);
+        }
+        this.setState({ pickedSource: { id, was: this.str('source') } });
+        this.set('source', id);
+        this.sourceTimer = setTimeout(() => {
+            this.sourceTimer = null;
+            this.setState({ pickedSource: null });
+        }, 5000);
     }
 
     private onSeekChange(value: number, commit: boolean): void {
@@ -802,8 +938,85 @@ export class MaPlayerComponent extends WidgetGeneric<MaPlayerComponentState, MaP
 
     // ---- player dialog ------------------------------------------------------
 
-    /** Collapse button and the player */
+    /** The source of the player as a small list below its name - if it has more than its own queue */
+    private renderSource(): React.JSX.Element | null {
+        const sources = this.state.sources;
+        if (this.props.settings.showSource === false || sources.length < 2 || !Select || !MenuItem) {
+            return null;
+        }
+        const value = this.str('source');
+        const picked = this.state.pickedSource;
+        // the state has moved on: show it
+        const shown = picked && picked.was === value ? picked.id : value;
+        // an active source the adapter has not named yet is shown with its ID
+        const options = sources.some(s => s.id === shown) ? sources : [...sources, { id: shown, name: shown }];
+        const accent = this.accent;
+
+        return (
+            <Select
+                variant="standard"
+                size="small"
+                disableUnderline
+                value={shown}
+                inputProps={{ 'aria-label': I18n.t('madm_source') }}
+                onChange={e => this.onSourceChange(String(e.target.value))}
+                renderValue={id => (
+                    <Box
+                        component="span"
+                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5, minWidth: 0 }}
+                    >
+                        <SourceIcon sx={{ fontSize: '1rem', flex: '0 0 auto' }} />
+                        <Box
+                            component="span"
+                            sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}
+                        >
+                            {options.find(s => s.id === id)?.name || id}
+                        </Box>
+                    </Box>
+                )}
+                sx={{
+                    maxWidth: '100%',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    color: accent,
+                    '& .MuiSelect-select': { py: 0.25 },
+                    '& .MuiSelect-icon': { color: accent },
+                }}
+            >
+                {options.map(source => (
+                    <MenuItem
+                        key={source.id}
+                        value={source.id}
+                    >
+                        {source.name}
+                    </MenuItem>
+                ))}
+            </Select>
+        );
+    }
+
+    /** Collapse button and the player, below it the source; the button of the library on the right */
     private renderDialogHeader(): React.JSX.Element {
+        if (this.state.libraryOpen) {
+            return (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0 }}>
+                    {this.renderButton(
+                        'back',
+                        <BackIcon sx={{ fontSize: 'inherit' }} />,
+                        () => this.setState({ libraryOpen: false }),
+                        { size: 34, title: I18n.t('madm_back') },
+                    )}
+                    <Typography
+                        variant="subtitle1"
+                        noWrap
+                        sx={{ flex: 1, minWidth: 0, textAlign: 'center', fontWeight: 700 }}
+                    >
+                        {I18n.t('madm_library')}
+                    </Typography>
+                    <Box sx={{ width: 34, flex: '0 0 auto' }} />
+                </Box>
+            );
+        }
         return (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0 }}>
                 {this.renderButton('close', <CollapseIcon sx={{ fontSize: 'inherit' }} />, this.closePlayer, {
@@ -825,8 +1038,18 @@ export class MaPlayerComponent extends WidgetGeneric<MaPlayerComponentState, MaP
                     >
                         {this.displayName}
                     </Typography>
+                    {this.renderSource()}
                 </Box>
-                <Box sx={{ width: 34, flex: '0 0 auto' }} />
+                {this.props.settings.showLibrary !== false ? (
+                    this.renderButton(
+                        'library',
+                        <LibraryIcon sx={{ fontSize: 'inherit' }} />,
+                        () => this.setState({ libraryOpen: true }),
+                        { size: 34, title: I18n.t('madm_library') },
+                    )
+                ) : (
+                    <Box sx={{ width: 34, flex: '0 0 auto' }} />
+                )}
             </Box>
         );
     }
@@ -1124,11 +1347,22 @@ export class MaPlayerComponent extends WidgetGeneric<MaPlayerComponentState, MaP
                     }}
                 >
                     {this.renderDialogHeader()}
-                    {this.renderDialogCover()}
-                    {this.renderDialogTitle()}
-                    {this.renderSeek()}
-                    {this.renderTransport()}
-                    {this.renderVolume()}
+                    {this.state.libraryOpen ? (
+                        <LibraryPanel
+                            load={this.loadLibrary}
+                            t={translate}
+                            accent={this.accent}
+                            onPick={this.onLibraryPick}
+                        />
+                    ) : (
+                        <>
+                            {this.renderDialogCover()}
+                            {this.renderDialogTitle()}
+                            {this.renderSeek()}
+                            {this.renderTransport()}
+                            {this.renderVolume()}
+                        </>
+                    )}
                 </Box>
             </Dialog>
         );

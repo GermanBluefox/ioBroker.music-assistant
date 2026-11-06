@@ -116,6 +116,7 @@ For every Music Assistant player, the adapter creates the channel `music-assista
 | `state`                                                                       | `0` = pause, `1` = play, `2` = stop (role `media.state`)           |
 | `playbackState`                                                               | Raw state of Music Assistant: `idle`, `paused`, `playing`          |
 | `available`, `powered`, `name`, `activeSource`, `queueId`                     | Player status (`powered` is writable)                              |
+| `source`                                                                      | Writable source (`media.input`), see below                         |
 | `volume` (0-100 %), `muted`                                                   | Writable volume control                                            |
 | `shuffle`, `repeat` (`0` = off, `1` = all, `2` = one)                         | Writable, the settings of the player's queue                       |
 | `mediaTitle`, `mediaArtist`, `mediaAlbum`, `mediaImage`                       | Now-playing metadata                                               |
@@ -131,6 +132,14 @@ not offered by these adapters.
 Writable states are acknowledged with the value Music Assistant reports after the command, not with
 the requested one - a volume the player cannot take shows its real value.
 
+### Choose the source: `source`
+
+`source` is the source the player plays: its own queue of Music Assistant (the ID of the player) or one of its
+native sources, such as Spotify Connect, AirPlay or a line input. `common.states` lists them with their names and
+follows the player; a passive source (one that only the player itself can start) is listed only while it is active.
+Write the ID of a source to switch to it (`players/cmd/select_source`); an empty value or the ID of the player
+switches back to the queue of Music Assistant. `activeSource` stays as it was: the raw value of Music Assistant.
+
 ### Play something: `playMedia`
 
 - A **URI** as Music Assistant uses it, e.g. `library://playlist/3`, `spotify://track/4uLU6hMCjMI75M1A2tKUQC`
@@ -141,6 +150,23 @@ the requested one - a volume the player cannot take shows its real value.
   `playlist:Party`, `radio:SWR3` (also `podcast:`, `audiobook:`, `genre:`).
 
 It replaces what the player's queue is playing now.
+
+### Pick from the library: message `getMedia`
+
+The players of the web component and both widgets have a library button: favorites, playlists and radio stations
+of Music Assistant with a search. They ask the adapter with the message `getMedia` and write the URI of the picked
+entry into `playMedia`. Scripts can use it too:
+
+```js
+sendTo('music-assistant.0', 'getMedia', { list: 'radios', search: 'swr', limit: 50 }, answer => {
+    // answer.items: [{ uri, name, subtitle, image, type }] - or answer.error
+    setState('music-assistant.0.players.kitchen.playMedia', answer.items[0].uri);
+});
+```
+
+`list` is `favorites`, `playlists` or `radios`; `search`, `limit` (1-500, default 100) and `offset` are optional.
+Favorites are those of the Music Assistant user the adapter signs in with. `image` is a thumbnail from the image
+proxy of Music Assistant, at the address the server reports (its `base_url`), so the browser has to reach it.
 
 A player that is deleted in Music Assistant is removed in ioBroker as well (also when it was deleted
 while the adapter was not running), together with its queue.
@@ -164,7 +190,9 @@ for older versions of vis-2 and devices, which list both.
 
 One widget for all players of an instance: the players are chips on top - a click switches to that player, a playing
 one shows a play icon. Below them the cover, title and artist, the position with a slider to jump within the track,
-previous/play-pause/next, shuffle, repeat, mute and the volume. A player that is off gets a power button.
+previous/play-pause/next, shuffle, repeat, mute and the volume. A player that is off gets a power button. A player
+with native sources (Spotify Connect, AirPlay, ...) shows the active one after the title, as a list to switch it.
+The library button after the title opens favorites, playlists and radio stations of Music Assistant to play.
 
 | Setting                        | Description                                                         |
 |--------------------------------|---------------------------------------------------------------------|
@@ -175,11 +203,15 @@ previous/play-pause/next, shuffle, repeat, mute and the volume. A player that is
 | Show players                   | the chips to switch the player                                      |
 | Hide unavailable players       | no chip for a player Music Assistant cannot reach                   |
 | Show cover / volume / shuffle… | the parts of the player                                             |
+| Show source selection          | the list of the sources after the title                             |
+| Show library                   | the button of the library after the title                           |
 
 ### devices: one player per tile
 
 The tile shows the cover with title, artist and the position; a click on it opens the whole player as a dialog -
-cover, position slider, transport, shuffle, repeat, mute and volume. The tile follows the size set in the dashboard:
+cover, position slider, transport, shuffle, repeat, mute and volume, and below the name of the player the list of
+its sources, if it has native ones (Spotify Connect, AirPlay, ...). The library button in the top right corner of
+the dialog switches it to favorites, playlists and radio stations of Music Assistant. The tile follows the size set in the dashboard:
 1x1 is the cover with the texts on it, 2x0.5 a row with a small cover on a blurred one, 2x1 and 2x2 the large cover
 with the texts below.
 
@@ -188,6 +220,8 @@ with the texts below.
 | Instance                   | the instance of music-assistant                                       |
 | Player                     | picked from the players the instance reports (message `getPlayers`)   |
 | Show cover / volume / …    | cover, volume slider, position, shuffle and repeat                    |
+| Show source selection      | the list of the sources in the player dialog                          |
+| Show library               | the button of the library in the player dialog                        |
 | Icon, Name                 | shown instead of the music note and the name of the player            |
 
 ## Web component: `<iob-ma-player>`
@@ -196,6 +230,9 @@ The adapter brings a player as a [web component](https://github.com/ioBroker/web
 every ioBroker UI with support for `@iobroker/web-components` shows alike - vis-2, the dashboard of devices, Aura,
 admin. It shows the cover, the title, the artist and the album, the position (also of a stream that has no end),
 play/pause, previous/next, shuffle, repeat, mute and the volume, and a power button for a player that is off.
+If the player has native sources (Spotify Connect, AirPlay, ...), the active one is shown after the name of the
+player as a list to switch the source. The library button at the end of that line opens favorites, playlists and
+radio stations of Music Assistant in a dialog; a click plays the entry on the player.
 
 | Setting                   | Description                                                                         |
 |---------------------------|-------------------------------------------------------------------------------------|
@@ -204,6 +241,8 @@ play/pause, previous/next, shuffle, repeat, mute and the volume, and a power but
 | Show cover                | the cover beside or above the texts                                                 |
 | Show volume               | the mute button and the volume slider                                               |
 | Show shuffle and repeat   | the two mode buttons                                                                |
+| Show source selection     | the list of the sources after the name, if the player has more than its own queue   |
+| Show library              | the button of the library after the name                                            |
 | Accent color              | of the sliders and the active buttons; empty: the color of the text                 |
 
 The element takes the colors and the font of the page it is shown in. It measures its box and arranges itself by it,
@@ -250,6 +289,8 @@ start/stop the instance manually from the Admin UI instead.
 * (@GermanBluefox) Added the web component `<iob-ma-player>` for vis-2, devices and the other UIs that show web components (`common.webComponents`)
 * (@GermanBluefox) Added native player widgets for vis-2 and for the dashboard of devices, built like the SONOS widgets. They have the name of the web component, so vis-2 and devices show only the native one
 * (@GermanBluefox) Added the message `getPlayers`, which lists the players of the instance
+* (@GermanBluefox) Added the writable state `source` (`media.input`) to switch the source of a player, and the source selection in the web component and both widgets
+* (@GermanBluefox) Added the message `getMedia` (favorites, playlists and radio stations of Music Assistant) and a library in the web component and both widgets to play from them
 
 ### 0.1.0 (2026-11-03)
 * (@GermanBluefox) Added the tab "Players" to the instance settings to see and control the players

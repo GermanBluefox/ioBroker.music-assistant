@@ -21,3 +21,33 @@ export function timeString(seconds: number): string {
     const m = Math.floor((seconds % 3600) / 60);
     return h ? `${h}:${m.toString().padStart(2, '0')}:${s}` : `${m}:${s}`;
 }
+
+/** A source of a player: its own queue of Music Assistant or a native one (Spotify Connect, AirPlay, ...) */
+export interface MaSource {
+    id: string;
+    name: string;
+}
+
+/**
+ * The sources of a player from `common.states` of its `source` state, which the adapter keeps up to date - the
+ * own queue first
+ *
+ * @param obj the object `music-assistant.<instance>.players.<player>.source`
+ */
+export function getSources(obj: ioBroker.Object | null | undefined): MaSource[] {
+    const states = obj?.type === 'state' ? obj.common.states : undefined;
+    if (!states) {
+        return [];
+    }
+    if (typeof states === 'string') {
+        return states
+            .split(';')
+            .map(part => part.split(':'))
+            .filter(([id]) => id)
+            .map(([id, ...name]) => ({ id, name: name.join(':') || id }));
+    }
+    if (Array.isArray(states)) {
+        return states.map(name => ({ id: String(name), name: String(name) }));
+    }
+    return Object.entries(states).map(([id, name]) => ({ id, name: String(name ?? id) }));
+}

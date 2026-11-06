@@ -5,7 +5,7 @@
  * `mediaPlayer`), so that ioBroker.assistant, ioBroker.devices, the material UI and others recognize
  * it: a numeric `media.state`, buttons with `button.play`/`button.pause`/..., repeat as a number.
  */
-import type { PlayerQueue, SearchResults } from './ma-types';
+import type { Player, PlayerQueue, SearchResults } from './ma-types';
 
 /** A button of a player or queue and the Music Assistant command it triggers */
 export interface ButtonDefinition {
@@ -60,6 +60,14 @@ export const PLAYER_STATES: Record<string, ioBroker.StateCommon> = {
         states: { 0: 'off', 1: 'all', 2: 'one' },
     },
     activeSource: { name: 'Active source', type: 'string', role: 'text', read: true, write: false },
+    source: {
+        name: 'Source',
+        desc: 'The source the player plays: its own queue of Music Assistant or a native source (common.states)',
+        type: 'string',
+        role: 'media.input',
+        read: true,
+        write: true,
+    },
     queueId: { name: 'Queue ID', type: 'string', role: 'text', read: true, write: false },
     elapsedTime: { name: 'Elapsed time', type: 'number', role: 'media.elapsed', unit: 's', read: true, write: false },
     duration: { name: 'Duration', type: 'number', role: 'media.duration', unit: 's', read: true, write: false },
@@ -127,6 +135,36 @@ export const QUEUE_BUTTONS: Record<string, ButtonDefinition> = {
  */
 export function defaultValue(common: ioBroker.StateCommon): ioBroker.StateValue {
     return common.type === 'boolean' ? false : common.type === 'number' ? 0 : '';
+}
+
+/** Name of the own queue of a player among its sources */
+export const QUEUE_SOURCE_NAME = 'Music Assistant';
+
+/**
+ * The sources of a player for `common.states` of its `source` state: first its own queue (the source with the ID
+ * of the player), then the native sources that can be selected. The active source is always in it, so that its
+ * value has a name - also a passive one, or the queue of a group the player plays in.
+ *
+ * @param player the player as Music Assistant reports it
+ * @param playerName name of another player by its ID, for the queue of a group
+ * @returns ID of the source → name
+ */
+export function sourceStates(
+    player: Player,
+    playerName: (playerId: string) => string | undefined,
+): Record<string, string> {
+    const states: Record<string, string> = { [player.player_id]: QUEUE_SOURCE_NAME };
+    for (const source of player.source_list ?? []) {
+        if (source?.id && !source.passive && !states[source.id]) {
+            states[source.id] = source.name || source.id;
+        }
+    }
+    const active = player.active_source;
+    if (active && !states[active]) {
+        const source = player.source_list?.find(s => s?.id === active);
+        states[active] = source?.name || playerName(active) || active;
+    }
+    return states;
 }
 
 /** Media types that may prefix a search text, e.g. `artist:Queen`, with the matching result list */

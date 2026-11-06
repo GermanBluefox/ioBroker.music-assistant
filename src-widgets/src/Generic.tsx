@@ -21,6 +21,7 @@ export const PLAYER_STATES = [
     'powered',
     'repeat',
     'shuffle',
+    'source',
     'state',
     'volume',
 ] as const;
@@ -39,6 +40,36 @@ export interface MaPlayerInfo {
 }
 
 type Socket = RxWidgetInfoCustomComponentContext['socket'];
+
+/** A source of a player: its own queue of Music Assistant or a native one (Spotify Connect, AirPlay, ...) */
+export interface MaSource {
+    id: string;
+    name: string;
+}
+
+/**
+ * The sources of a player from `common.states` of its `source` state, which the adapter keeps up to date - the
+ * own queue first
+ *
+ * @param obj the object `music-assistant.<n>.players.<id>.source`
+ */
+export function getSources(obj: ioBroker.Object | null | undefined): MaSource[] {
+    const states = obj?.type === 'state' ? obj.common.states : undefined;
+    if (!states) {
+        return [];
+    }
+    if (typeof states === 'string') {
+        return states
+            .split(';')
+            .map(part => part.split(':'))
+            .filter(([id]) => id)
+            .map(([id, ...name]) => ({ id, name: name.join(':') || id }));
+    }
+    if (Array.isArray(states)) {
+        return states.map(name => ({ id: String(name), name: String(name) }));
+    }
+    return Object.entries(states).map(([id, name]) => ({ id, name: String(name ?? id) }));
+}
 
 /** `common.name` may be a plain string or a translation object */
 export function getName(name: ioBroker.StringOrTranslated | undefined, lang: string): string {

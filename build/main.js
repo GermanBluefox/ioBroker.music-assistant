@@ -24,6 +24,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 var utils = __toESM(require("@iobroker/adapter-core"));
 var import_ma_client = require("./lib/ma-client");
 var import_objects = require("./lib/objects");
+var import_media = require("./lib/media");
 var import_players = require("./lib/players");
 const DOCKER_PORT = 8095;
 const DOCKER_USED_PORTS = [DOCKER_PORT, 8097];
@@ -42,6 +43,12 @@ class MusicAssistant extends utils.Adapter {
   // sanitized -> raw queue_id
   knownPlayerObjects = /* @__PURE__ */ new Set();
   knownQueueObjects = /* @__PURE__ */ new Set();
+  playerNames = /* @__PURE__ */ new Map();
+  // raw player_id -> name
+  /** `common.states` of `players.<id>.source` as last written, as JSON - by sanitized id */
+  writtenSources = /* @__PURE__ */ new Map();
+  /** The address of Music Assistant as it reports it, for the thumbnails of `getMedia` */
+  maBaseUrl = "";
   constructor(options = {}) {
     super({
       ...options,
@@ -101,6 +108,9 @@ class MusicAssistant extends utils.Adapter {
       }
     );
     this.client = client;
+    client.on("serverInfo", (info) => {
+      this.maBaseUrl = (0, import_media.normalizeBaseUrl)(info.base_url, `http://${host}:${port}`);
+    });
     client.on(
       "setupDone",
       (user) => this.log.info(
@@ -299,8 +309,13 @@ class MusicAssistant extends utils.Adapter {
    */
   async removeChannel(folder, safeId) {
     if (folder === "players") {
+      const playerId = this.playerIds.get(safeId);
+      if (playerId) {
+        this.playerNames.delete(playerId);
+      }
       this.playerIds.delete(safeId);
       this.knownPlayerObjects.delete(safeId);
+      this.writtenSources.delete(safeId);
     } else {
       this.queueIds.delete(safeId);
       this.knownQueueObjects.delete(safeId);
@@ -399,8 +414,10 @@ class MusicAssistant extends utils.Adapter {
     var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
     const safeId = sanitizeId(player.player_id);
     this.playerIds.set(safeId, player.player_id);
+    this.playerNames.set(player.player_id, player.name);
     await this.ensurePlayerObjects(safeId, player.name);
     const base = `players.${safeId}`;
+    await this.writeSourceStates(safeId, player);
     const media = player.current_media;
     const values = {
       playerId: player.player_id,
@@ -412,6 +429,8 @@ class MusicAssistant extends utils.Adapter {
       volume: (_b = player.volume_level) != null ? _b : 0,
       muted: !!player.volume_muted,
       activeSource: (_c = player.active_source) != null ? _c : "",
+      // no active source: the own queue
+      source: player.active_source || player.player_id,
       // the own queue of a player has the id of the player
       queueId: player.player_id,
       mediaTitle: (_d = media == null ? void 0 : media.title) != null ? _d : "",
@@ -423,6 +442,34 @@ class MusicAssistant extends utils.Adapter {
     };
     for (const [key, val] of Object.entries(values)) {
       await this.setStateChangedAsync(`${base}.${key}`, val, true);
+    }
+  }
+  /**
+   * Writes the sources of a player into `common.states` of its `source` state, when they changed. A player
+   * reports its sources with every update, so they are compared with what was written last. The object is
+   * replaced, not extended: `extendObject` merges `states` and would keep a source that is gone.
+   *
+   * @param safeId sanitized id of the player
+   * @param player the player as Music Assistant reports it
+   */
+  async writeSourceStates(safeId, player) {
+    const states = (0, import_objects.sourceStates)(player, (playerId) => this.playerNames.get(playerId));
+    const json = JSON.stringify(states);
+    if (this.writtenSources.get(safeId) === json) {
+      return;
+    }
+    const id = `players.${safeId}.source`;
+    try {
+      const obj = await this.getObjectAsync(id);
+      if ((obj == null ? void 0 : obj.type) === "state") {
+        if (JSON.stringify(obj.common.states) !== json) {
+          obj.common.states = states;
+          await this.setObjectAsync(id, obj);
+        }
+        this.writtenSources.set(safeId, json);
+      }
+    } catch (err) {
+      this.log.warn(`Cannot write the sources of ${id}: ${err.message}`);
     }
   }
   // ---------- Player queues ----------
@@ -512,7 +559,7 @@ class MusicAssistant extends utils.Adapter {
     }
   }
   async handlePlayerCommand(safeId, path, state) {
-    var _a;
+    var _a, _b;
     const playerId = this.playerIds.get(safeId);
     if (!playerId || !this.client || path.length !== 1) {
       return "none";
@@ -561,6 +608,12 @@ class MusicAssistant extends utils.Adapter {
       case "playMedia":
         await this.playMedia(playerId, String((_a = state.val) != null ? _a : ""));
         return "ack";
+      case "source":
+        await this.client.sendCommand("players/cmd/select_source", {
+          player_id: playerId,
+          source: String((_b = state.val) != null ? _b : "") || playerId
+        });
+        return "refresh";
       default:
         return "none";
     }
@@ -640,7 +693,60 @@ class MusicAssistant extends utils.Adapter {
         this.log.warn(`Cannot list the players: ${error.message}`);
       }
       this.sendTo(obj.from, obj.command, result, obj.callback);
+    } else if (obj.command === "getMedia") {
+      const request = (0, import_media.parseMediaRequest)(obj.message);
+      let result;
+      if (typeof request === "string") {
+        result = { error: request };
+      } else {
+        try {
+          result = { items: await this.listMedia(request) };
+        } catch (error) {
+          this.log.warn(`Cannot list the ${request.list}: ${error.message}`);
+          result = { error: error.message };
+        }
+      }
+      this.sendTo(obj.from, obj.command, result, obj.callback);
     }
+  }
+  /**
+   * Favorites, playlists or radio stations of the library of Music Assistant, for the message `getMedia`.
+   * Favorites are those of the user the adapter signs in with.
+   *
+   * @param request what the UI asked for
+   */
+  async listMedia(request) {
+    var _a;
+    const client = this.client;
+    if (!client) {
+      throw new Error("Not connected to Music Assistant");
+    }
+    const search = request.search ? { search: request.search } : {};
+    let items;
+    if (request.list === "favorites") {
+      const lists = await Promise.allSettled(
+        import_media.FAVORITE_TYPES.map(
+          (type) => client.sendCommand((0, import_media.libraryCommand)(type), {
+            favorite: true,
+            limit: request.offset + request.limit,
+            order_by: "sort_name",
+            ...search
+          })
+        )
+      );
+      const found = lists.filter((l) => l.status === "fulfilled");
+      if (!found.length && ((_a = lists[0]) == null ? void 0 : _a.status) === "rejected") {
+        throw lists[0].reason;
+      }
+      items = found.flatMap((l) => Array.isArray(l.value) ? l.value : []).slice(request.offset, request.offset + request.limit);
+    } else {
+      const result = await client.sendCommand(
+        (0, import_media.libraryCommand)(request.list === "playlists" ? "playlist" : "radio"),
+        { limit: request.limit, offset: request.offset, order_by: "sort_name", ...search }
+      );
+      items = Array.isArray(result) ? result : [];
+    }
+    return items.map((item) => (0, import_media.toMediaEntry)(item, this.maBaseUrl)).filter((e) => !!e);
   }
   onUnload(callback) {
     var _a;

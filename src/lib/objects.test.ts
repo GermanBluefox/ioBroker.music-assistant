@@ -1,8 +1,16 @@
 import { expect } from 'chai';
 import ChannelDetector, { type DetectOptions } from '@iobroker/type-detector';
 
-import { defaultValue, parsePlayMedia, pickSearchResult, PLAYER_BUTTONS, PLAYER_STATES } from './objects';
-import type { SearchResults } from './ma-types';
+import {
+    defaultValue,
+    parsePlayMedia,
+    pickSearchResult,
+    PLAYER_BUTTONS,
+    PLAYER_STATES,
+    QUEUE_SOURCE_NAME,
+    sourceStates,
+} from './objects';
+import type { Player, SearchResults } from './ma-types';
 
 const NS = 'music-assistant.0';
 
@@ -131,5 +139,51 @@ describe('pickSearchResult', () => {
 
     it('returns undefined for empty results', () => {
         expect(pickSearchResult({}, 'Queen')).to.equal(undefined);
+    });
+});
+
+describe('sourceStates', () => {
+    const player = (activeSource: string | null, sources: Player['source_list']): Player => ({
+        player_id: 'kitchen',
+        name: 'Kitchen',
+        available: true,
+        powered: true,
+        playback_state: 'playing',
+        elapsed_time: 0,
+        volume_level: 20,
+        volume_muted: false,
+        active_source: activeSource,
+        source_list: sources,
+        current_media: null,
+    });
+    const names = (id: string): string | undefined => ({ living: 'Living room' })[id];
+
+    it('lists the own queue first, then the sources that can be selected', () => {
+        const states = sourceStates(
+            player('kitchen', [
+                { id: 'spotify', name: 'Spotify Connect' },
+                { id: 'airplay', name: 'AirPlay', passive: true },
+                { id: 'line_in', name: 'Line-In' },
+            ]),
+            names,
+        );
+        expect(states).to.deep.equal({ kitchen: QUEUE_SOURCE_NAME, spotify: 'Spotify Connect', line_in: 'Line-In' });
+        expect(Object.keys(states)[0]).to.equal('kitchen');
+    });
+
+    it('keeps the active source even if it is passive', () => {
+        const states = sourceStates(player('airplay', [{ id: 'airplay', name: 'AirPlay', passive: true }]), names);
+        expect(states).to.deep.equal({ kitchen: QUEUE_SOURCE_NAME, airplay: 'AirPlay' });
+    });
+
+    it('names the queue of a group by its player', () => {
+        expect(sourceStates(player('living', []), names)).to.deep.equal({
+            kitchen: QUEUE_SOURCE_NAME,
+            living: 'Living room',
+        });
+        expect(sourceStates(player('unknown', undefined), names)).to.deep.equal({
+            kitchen: QUEUE_SOURCE_NAME,
+            unknown: 'unknown',
+        });
     });
 });
