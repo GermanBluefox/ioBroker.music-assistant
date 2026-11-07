@@ -276,7 +276,8 @@ The element writes the states of the player channel only - the adapter sends the
 
 ```bash
 npm install
-npm run build   # compile TypeScript
+npm run build   # compile TypeScript and build all four GUIs (build:all)
+npm run build:ts  # compile TypeScript only
 npm run test    # type-check + package tests
 npm run lint    # ESLint
 npm run build:admin  # build the "Players" tab (src-admin/ -> admin/custom/, commit the result)
@@ -284,7 +285,7 @@ npm run build:wc     # build the web component (src-webcomponents/ -> admin/webc
 npm run build:widgets  # build the vis-2 widgets (src-widgets/ -> widgets/music-assistant/, commit the result)
 npm run build:devices  # build the devices widgets (src-devices/ -> admin/dm-widgets/, commit the result)
 npm run build:gui      # all four of them
-npm run build:all      # the adapter and all four GUIs
+npm run build:all      # the adapter and all four GUIs, the same as npm run build
 dev-server run  # run against a local test ioBroker instance (see README note below)
 ```
 

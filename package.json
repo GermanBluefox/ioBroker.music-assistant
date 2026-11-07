@@ -71,7 +71,7 @@
     "build:widgets": "node tasks.mts --widgets",
     "build:devices": "node tasks.mts --devices",
     "build:gui": "node tasks.mts --all",
-    "build:all": "npm run build && npm run build:gui",
+    "build:all": "npm run build:ts && npm run build:gui",
     "test:ts": "mocha --config test/mocharc.custom.json src/**/*.test.ts",
     "test:package": "mocha test/package --exit",
     "test:integration": "mocha test/integration --exit",
