@@ -284,7 +284,8 @@ export class MaPlayerComponent extends WidgetGeneric<MaPlayerComponentState, MaP
             },
         };
 
-        return { name: 'MaPlayer', schema };
+        // json-config may know item types that dm-utils does not yet (e.g. `diskSelector`): this schema uses none
+        return { name: 'MaPlayer', schema: schema as ConfigItemPanel };
     }
 
     private get instance(): string {

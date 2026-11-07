@@ -1,6 +1,8 @@
 /**
  * The styles of the shadow root. The element fills the box of the host; it has a transparent background and
- * inherits `color` and `font`, so it follows the theme of the host.
+ * inherits `color` and `font`, so it follows the theme of the host. The rest of the theme - the primary color for the
+ * accent, the colors of a panel - comes as the CSS variables `--iob-*` that the base class sets on the element, with
+ * `color-scheme` for the list of the sources.
  *
  * Which layout (`wide`, `card`, `tall`, `row`) and how big the parts are is decided in `layout.ts` from the
  * measured size of the box; the sizes come in as variables: `--pad`, `--gap`, `--icon`, `--cover` and `--fs-*`.
@@ -178,14 +180,11 @@ export const STYLES = `
     cursor: default;
     opacity: 0.6;
 }
-/* the list itself is drawn by the browser: in the colors of the theme, not in the inherited color */
+/* the list itself is drawn by the browser: in the colors of a panel of the host, not in the inherited color */
 .source option {
-    color: CanvasText;
-    background-color: Canvas;
+    color: var(--iob-text, CanvasText);
+    background-color: var(--iob-paper, Canvas);
     text-transform: none;
-}
-.player.dark {
-    color-scheme: dark;
 }
 .source svg {
     position: absolute;

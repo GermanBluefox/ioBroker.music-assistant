@@ -14,7 +14,7 @@
  */
 import { createRoot, type Root } from 'react-dom/client';
 
-import { defineWebComponent, IobWebComponent } from '@iobroker/web-components/element';
+import { defineWebComponent, getThemeCssVariables, IobWebComponent } from '@iobroker/web-components/element';
 
 import { getPlayerChannel, PLAYER_STATES, TAG, type PlayerCommand, type PlayerSettings } from './constants';
 import { getWord, type WordKey } from './i18n';
@@ -90,15 +90,19 @@ class MusicAssistantPlayer extends IobWebComponent<PlayerSettings> {
         const lang = this.systemLang;
         const word = (key: WordKey): string => getWord(lang, key);
 
-        // the host moves this element into its dialog: it brings its own styles
+        // the host moves this element into its dialog: it brings its own styles, and the theme of the host as the
+        // same CSS variables (`--iob-primary`, ...) the base class sets on this element
         const element = document.createElement('div');
         element.style.width = '100%';
         element.style.height = '100%';
+        for (const [name, value] of Object.entries(getThemeCssVariables(this.theme))) {
+            element.style.setProperty(name, value);
+        }
         const shadow = element.attachShadow({ mode: 'open' });
         const style = document.createElement('style');
         style.textContent = LIBRARY_STYLES;
         const mount = document.createElement('div');
-        mount.className = this.theme === 'dark' ? 'mount dark' : 'mount';
+        mount.className = 'mount';
         if (this.settings.accent) {
             mount.style.setProperty('--accent', this.settings.accent);
         }
@@ -197,7 +201,6 @@ class MusicAssistantPlayer extends IobWebComponent<PlayerSettings> {
                 showSource={settings.showSource !== false}
                 onLibrary={settings.showLibrary !== false ? () => void this.#openLibrary(channel) : undefined}
                 accent={settings.accent}
-                theme={this.theme}
                 editMode={this.editMode}
                 word={word}
                 onCommand={(command: PlayerCommand, value: ioBroker.StateValue) =>

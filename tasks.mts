@@ -6,7 +6,8 @@
  *   src-widgets/        -> widgets/music-assistant/ the native vis-2 widget set (Module Federation)
  *   src-devices/        -> admin/dm-widgets/        the native ioBroker.devices widgets (Module Federation)
  *
- * `npm run build:admin`, `build:wc`, `build:widgets` and `build:devices` build one each, `build:gui` all of them.
+ * `npm run build:admin`, `build:wc`, `build:widgets` and `build:devices` build one each, `build:gui` all of them;
+ * `build:all` builds the adapter (`npm run build`) and then all of them.
  * The results are committed instead of being rebuilt on install or in CI: rebuild and commit the destination
  * whenever something in its source folder changed.
  *

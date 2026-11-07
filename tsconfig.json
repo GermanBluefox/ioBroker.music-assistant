@@ -14,6 +14,8 @@
 
         "noEmitOnError": true,
         "outDir": "./build/",
+        // TypeScript 6 wants it explicitly when `outDir` is set: src/ and test/ are below this folder
+        "rootDir": "./",
         "removeComments": false,
 
         // This is necessary for the automatic typing of the adapter config

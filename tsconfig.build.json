@@ -5,6 +5,8 @@
         "allowJs": false,
         "checkJs": false,
         "noEmit": false,
+        // build/main.js, not build/src/main.js
+        "rootDir": "./src",
         "declaration": false
     },
     "include": [

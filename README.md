@@ -251,10 +251,12 @@ a click plays the entry on the player.
 | Show shuffle and repeat   | the two mode buttons                                                                |
 | Show source selection     | the list of the sources after the name, if the player has more than its own queue   |
 | Show library              | the button of the library after the name                                            |
-| Accent color              | of the sliders and the active buttons; empty: the color of the text                 |
+| Accent color              | of the sliders and the active buttons; empty: the primary color of the host         |
 
-The element takes the colors and the font of the page it is shown in. It measures its box and arranges itself by it,
-also while the box is resized:
+The element takes the colors and the font of the page it is shown in: the text color and the font it inherits, the
+primary color (for the accent), the colors of panels, lines and errors and light or dark from the theme the host
+hands over (`@iobroker/web-components` 0.5 or newer). It measures its box and arranges itself by it, also while the
+box is resized:
 
 | Box                         | Layout                                                                      |
 |-----------------------------|-----------------------------------------------------------------------------|
@@ -281,6 +283,7 @@ npm run build:wc     # build the web component (src-webcomponents/ -> admin/webc
 npm run build:widgets  # build the vis-2 widgets (src-widgets/ -> widgets/music-assistant/, commit the result)
 npm run build:devices  # build the devices widgets (src-devices/ -> admin/dm-widgets/, commit the result)
 npm run build:gui      # all four of them
+npm run build:all      # the adapter and all four GUIs
 dev-server run  # run against a local test ioBroker instance (see README note below)
 ```
 

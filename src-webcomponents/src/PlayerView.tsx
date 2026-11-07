@@ -48,10 +48,8 @@ export interface PlayerViewProps {
     showSource: boolean;
     /** Opens the library of Music Assistant; no button without it */
     onLibrary?: () => void;
-    /** Color of the sliders and the active buttons; the color of the text if empty */
+    /** Color of the sliders and the active buttons; the primary color of the host if empty */
     accent?: string;
-    /** For the list of the sources, which the browser draws */
-    theme: 'light' | 'dark';
     editMode: boolean;
     word: (key: WordKey) => string;
     onCommand: (command: PlayerCommand, value: ioBroker.StateValue) => void;
@@ -279,7 +277,8 @@ export function PlayerView(props: PlayerViewProps): JSX.Element {
         : null;
 
     const classes = ['player'];
-    const style: Record<string, string> = { '--accent': props.accent || 'currentColor' };
+    // `--iob-primary` and the other colors of the host are set on the element by the base class
+    const style: Record<string, string> = { '--accent': props.accent || 'var(--iob-primary, currentColor)' };
     if (layout) {
         classes.push(layout.kind);
         style['--pad'] = `${layout.pad}px`;
@@ -290,9 +289,6 @@ export function PlayerView(props: PlayerViewProps): JSX.Element {
         style['--fs-title'] = `${layout.fonts.title}px`;
         style['--fs-artist'] = `${layout.fonts.artist}px`;
         style['--fs-time'] = `${layout.fonts.time}px`;
-    }
-    if (props.theme === 'dark') {
-        classes.push('dark');
     }
     if (editMode) {
         classes.push('edit');

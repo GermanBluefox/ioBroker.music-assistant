@@ -4,7 +4,8 @@
  * back, the player writes it into `playMedia`.
  *
  * The view is rendered into an element of its own, which the host frames as a dialog (`openDialog`). It brings its
- * own styles in a shadow root and inherits only the font and the color of the dialog.
+ * own styles in a shadow root and inherits only the font and the color of the dialog; the other colors come from the
+ * theme of the host as CSS variables (`--iob-primary`, `--iob-divider`, ...) on that element.
  *
  * It remembers where the user was (list, search, loaded entries, scroll position) in the local storage of the browser
  * and opens there again the next time.
@@ -387,12 +388,11 @@ export const LIBRARY_STYLES = `
     width: 100%;
     height: 100%;
 }
-.mount.dark {
-    color-scheme: dark;
-}
 .library {
+    --accent-color: var(--accent, var(--iob-primary, currentColor));
     --hover: color-mix(in srgb, currentColor 10%, transparent);
-    --line: color-mix(in srgb, currentColor 20%, transparent);
+    --line: var(--iob-divider, color-mix(in srgb, currentColor 20%, transparent));
+    --radius: var(--iob-border-radius, 4px);
     box-sizing: border-box;
     width: 100%;
     height: 100%;
@@ -421,7 +421,7 @@ button {
 }
 button:focus-visible,
 .search:focus-visible {
-    outline: 2px solid var(--accent, currentColor);
+    outline: 2px solid var(--accent-color);
     outline-offset: 1px;
 }
 .tab {
@@ -437,15 +437,19 @@ button:focus-visible,
 .tab.active {
     opacity: 1;
     font-weight: 600;
-    border-bottom-color: var(--accent, currentColor);
+    color: var(--accent-color);
+    border-bottom-color: var(--accent-color);
 }
 .search {
     font: inherit;
     color: inherit;
     background: transparent;
     border: 1px solid var(--line);
-    border-radius: 6px;
+    border-radius: var(--radius);
     padding: 6px 10px;
+}
+.search:focus {
+    border-color: var(--accent-color);
 }
 .list {
     flex: 1;
@@ -463,7 +467,7 @@ button:focus-visible,
     align-items: center;
     gap: 10px;
     padding: 6px;
-    border-radius: 6px;
+    border-radius: var(--radius);
     text-align: left;
 }
 .item:hover {
@@ -478,13 +482,14 @@ button:focus-visible,
 }
 .item:hover > svg,
 .item:focus-visible > svg {
-    opacity: 0.7;
+    opacity: 1;
+    fill: var(--accent-color);
 }
 .thumb {
     flex: none;
     width: 44px;
     height: 44px;
-    border-radius: 4px;
+    border-radius: var(--radius);
     overflow: hidden;
     display: flex;
     align-items: center;
@@ -520,15 +525,16 @@ button:focus-visible,
 }
 .entry-sub {
     font-size: 0.85em;
-    opacity: 0.7;
+    color: var(--iob-text-secondary, inherit);
 }
 .more {
     display: block;
     width: 100%;
     margin: 4px 0;
     padding: 8px;
-    border: 1px solid var(--line);
-    border-radius: 6px;
+    color: var(--accent-color);
+    border: 1px solid var(--accent-color);
+    border-radius: var(--radius);
 }
 .more:hover:not(:disabled) {
     background: var(--hover);
@@ -540,9 +546,9 @@ button:focus-visible,
 .note {
     padding: 24px 8px;
     text-align: center;
-    opacity: 0.7;
+    color: var(--iob-text-secondary, inherit);
 }
 .note.error {
-    opacity: 1;
+    color: var(--iob-error, inherit);
 }
 `;

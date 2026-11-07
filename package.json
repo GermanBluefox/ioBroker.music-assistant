@@ -25,8 +25,8 @@
   },
   "dependencies": {
     "@iobroker/adapter-core": "^3.4.3",
-    "@iobroker/plugin-docker": "^1.2.1",
-    "ws": "^8.18.0"
+    "@iobroker/plugin-docker": "^1.3.1",
+    "ws": "^8.22.1"
   },
   "devDependencies": {
     "@alcalzone/release-script": "^5.2.1",
@@ -39,14 +39,14 @@
     "@iobroker/eslint-config": "^2.3.4",
     "@iobroker/testing": "^6.3.1",
     "@iobroker/type-detector": "^6.2.0",
-    "@tsconfig/node22": "^22.0.2",
+    "@tsconfig/node22": "^22.0.6",
     "@types/iobroker": "npm:@iobroker/types@^7.2.5",
-    "@types/node": "^22.18.10",
-    "@types/ws": "^8.18.1",
-    "rimraf": "^6.1.3",
+    "@types/node": "^22.20.5",
+    "@types/ws": "^8.18.2",
+    "rimraf": "^6.1.4",
     "source-map-support": "^0.5.21",
     "ts-node": "^10.9.2",
-    "typescript": "~5.9.3"
+    "typescript": "~6.0.3"
   },
   "main": "build/main.js",
   "files": [
@@ -61,7 +61,7 @@
   ],
   "scripts": {
     "prebuild": "rimraf build",
-    "build": "build-adapter ts",
+    "build": "npm run build:all",
     "watch": "build-adapter ts --watch",
     "prebuild:ts": "rimraf build",
     "build:ts": "build-adapter ts",
@@ -71,6 +71,7 @@
     "build:widgets": "node tasks.mts --widgets",
     "build:devices": "node tasks.mts --devices",
     "build:gui": "node tasks.mts --all",
+    "build:all": "npm run build && npm run build:gui",
     "test:ts": "mocha --config test/mocharc.custom.json src/**/*.test.ts",
     "test:package": "mocha test/package --exit",
     "test:integration": "mocha test/integration --exit",
@@ -87,7 +88,9 @@
     "check:devices": "cd src-devices && npm run check-ts",
     "translate": "translate-adapter",
     "release": "release-script",
-    "dev-server": "dev-server"
+    "dev-server": "dev-server",
+    "update-packages": "npx -y npm-check-updates --upgrade && cd src-admin && npx -y npm-check-updates --upgrade && cd ../src-webcomponents && npx -y npm-check-updates --upgrade && cd ../src-widgets && npx -y npm-check-updates --upgrade && cd ../src-devices && npx -y npm-check-updates --upgrade",
+    "npm": "npm i && cd src-admin && npm i && cd ../src-webcomponents && npm i && cd ../src-widgets && npm i && cd ../src-devices && npm i"
   },
   "bugs": {
     "url": "https://github.com/NurPech/ioBroker.music-assistant/issues"
