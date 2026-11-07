@@ -521,7 +521,7 @@ class MusicAssistant extends utils.Adapter {
             available: !!queue.available,
             state: queue.state,
             shuffleEnabled: !!queue.shuffle_enabled,
-            repeatMode: queue.repeat_mode,
+            repeatMode: REPEAT_TO_NUMBER[queue.repeat_mode] ?? REPEAT_TO_NUMBER.off,
             elapsedTime: queue.elapsed_time ?? 0,
             currentItemName: queue.current_item?.name ?? '',
         };
@@ -719,7 +719,11 @@ class MusicAssistant extends utils.Adapter {
             return 'refresh';
         }
         if (path[0] === 'repeatMode') {
-            await this.client.sendCommand('player_queues/repeat', { queue_id: queueId, repeat_mode: state.val });
+            const mode = NUMBER_TO_REPEAT[Number(state.val)];
+            if (!mode) {
+                throw new Error(`Unknown repeat mode ${String(state.val)}, use 0 (off), 1 (all) or 2 (one)`);
+            }
+            await this.client.sendCommand('player_queues/repeat', { queue_id: queueId, repeat_mode: mode });
             return 'refresh';
         }
         return 'none';
