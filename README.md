@@ -151,7 +151,7 @@ For every player queue, `music-assistant.0.queues.<queue_id>` gets:
 | State                                                                 | Description              |
 |-----------------------------------------------------------------------|--------------------------|
 | `state`, `displayName`, `available`, `currentItemName`, `elapsedTime` | Queue status             |
-| `shuffleEnabled`, `repeatMode`                                        | Writable queue settings  |
+| `shuffleEnabled`, `repeatMode`                                        | Writable queue settings (`repeatMode`: 0 = off, 1 = all, 2 = one) |
 | `control.play` / `pause` / `playPause` / `stop` / `next` / `previous` | Writable control buttons |
 
 ## Widgets for vis-2 and devices
@@ -247,6 +247,9 @@ start/stop the instance manually from the Admin UI instead.
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+* (@M1kad0) Changed `queues.<id>.repeatMode` from a string (`off`/`one`/`all`) to a number (0 = off, 1 = all, 2 = one), like `players.<id>.repeat`, so that it matches the type of the role `media.mode.repeat`
+
 ### 0.2.0 (2026-11-05)
 * (@GermanBluefox) Added the web component `<iob-ma-player>` for vis-2, devices and the other UIs that show web components (`common.webComponents`)
 * (@GermanBluefox) Added native player widgets for vis-2 and for the dashboard of devices, built like the SONOS widgets. They have the name of the web component, so vis-2 and devices show only the native one
