@@ -22,6 +22,7 @@ import {
 import {
     FAVORITE_TYPES,
     libraryCommand,
+    listType,
     type MaLibraryItem,
     type MediaEntry,
     type MediaRequest,
@@ -824,7 +825,7 @@ class MusicAssistant extends utils.Adapter {
     }
 
     /**
-     * Favorites, playlists or radio stations of the library of Music Assistant, for the message `getMedia`.
+     * The favorites or the library items of one media type of Music Assistant, for the message `getMedia`.
      * Favorites are those of the user the adapter signs in with.
      *
      * @param request what the UI asked for
@@ -836,7 +837,8 @@ class MusicAssistant extends utils.Adapter {
         }
         const search = request.search ? { search: request.search } : {};
         let items: MaLibraryItem[];
-        if (request.list === 'favorites') {
+        const type = listType(request.list);
+        if (!type) {
             // one query per media type; enough of each for the page, then one list in the order of the types
             const lists = await Promise.allSettled(
                 FAVORITE_TYPES.map(type =>
@@ -857,10 +859,12 @@ class MusicAssistant extends utils.Adapter {
                 .flatMap(l => (Array.isArray(l.value) ? l.value : []))
                 .slice(request.offset, request.offset + request.limit);
         } else {
-            const result = await client.sendCommand<MaLibraryItem[]>(
-                libraryCommand(request.list === 'playlists' ? 'playlist' : 'radio'),
-                { limit: request.limit, offset: request.offset, order_by: 'sort_name', ...search },
-            );
+            const result = await client.sendCommand<MaLibraryItem[]>(libraryCommand(type), {
+                limit: request.limit,
+                offset: request.offset,
+                order_by: 'sort_name',
+                ...search,
+            });
             items = Array.isArray(result) ? result : [];
         }
         return items.map(item => toMediaEntry(item, this.maBaseUrl)).filter((e): e is MediaEntry => !!e);

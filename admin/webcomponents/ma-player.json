@@ -195,17 +195,17 @@
                     "zh-cn": "显示媒体库"
                 },
                 "help": {
-                    "en": "A button after the name: favorites, playlists and radio stations of Music Assistant to play",
-                    "de": "Eine Taste nach dem Namen: Favoriten, Playlists und Radiosender von Music Assistant zum Abspielen",
-                    "ru": "Кнопка после названия: избранное, плейлисты и радиостанции Music Assistant для воспроизведения",
-                    "pt": "Um botão após o nome: favoritos, playlists e rádios do Music Assistant para reproduzir",
-                    "nl": "Een knop na de naam: favorieten, afspeellijsten en radiozenders van Music Assistant om af te spelen",
-                    "fr": "Un bouton après le nom : favoris, playlists et radios de Music Assistant à lire",
-                    "it": "Un pulsante dopo il nome: preferiti, playlist e radio di Music Assistant da riprodurre",
-                    "es": "Un botón tras el nombre: favoritos, listas y radios de Music Assistant para reproducir",
-                    "pl": "Przycisk po nazwie: ulubione, playlisty i stacje radiowe Music Assistant do odtworzenia",
-                    "uk": "Кнопка після назви: обране, плейлисти та радіостанції Music Assistant для відтворення",
-                    "zh-cn": "名称后的按钮：播放 Music Assistant 的收藏、播放列表和电台"
+                    "en": "A button after the name: the library of Music Assistant (favorites, artists, albums, tracks, playlists, radio, ...) to play from",
+                    "de": "Eine Taste nach dem Namen: die Bibliothek von Music Assistant (Favoriten, Künstler, Alben, Titel, Playlists, Radio, …) zum Abspielen",
+                    "ru": "Кнопка после названия: библиотека Music Assistant (избранное, исполнители, альбомы, треки, плейлисты, радио, …) для воспроизведения",
+                    "pt": "Um botão após o nome: a biblioteca do Music Assistant (favoritos, artistas, álbuns, faixas, playlists, rádio, …) para reproduzir",
+                    "nl": "Een knop na de naam: de bibliotheek van Music Assistant (favorieten, artiesten, albums, nummers, afspeellijsten, radio, …) om af te spelen",
+                    "fr": "Un bouton après le nom : la bibliothèque de Music Assistant (favoris, artistes, albums, titres, playlists, radio, …) à lire",
+                    "it": "Un pulsante dopo il nome: la libreria di Music Assistant (preferiti, artisti, album, brani, playlist, radio, …) da riprodurre",
+                    "es": "Un botón tras el nombre: la biblioteca de Music Assistant (favoritos, artistas, álbumes, canciones, listas, radio, …) para reproducir",
+                    "pl": "Przycisk po nazwie: biblioteka Music Assistant (ulubione, wykonawcy, albumy, utwory, playlisty, radio, …) do odtworzenia",
+                    "uk": "Кнопка після назви: бібліотека Music Assistant (обране, виконавці, альбоми, треки, плейлисти, радіо, …) для відтворення",
+                    "zh-cn": "名称后的按钮：播放 Music Assistant 媒体库中的内容（收藏、艺术家、专辑、曲目、播放列表、电台等）"
                 }
             },
             "accent": {

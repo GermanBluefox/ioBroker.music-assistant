@@ -439,7 +439,12 @@ export default class MaPlayer extends Generic<MaPlayerRxData, MaPlayerState> {
     }
 
     /** Asks the instance for a list of the library, see `getMedia` in src/main.ts */
-    private loadLibrary = (list: LibraryList, search: string): Promise<LibraryAnswer> => {
+    private loadLibrary = (
+        list: LibraryList,
+        search: string,
+        offset: number,
+        limit: number,
+    ): Promise<LibraryAnswer> => {
         let timer: ReturnType<typeof setTimeout> | undefined;
         const timeout = new Promise<LibraryAnswer>((_resolve, reject) => {
             timer = setTimeout(() => reject(new Error(MaPlayer.t('library_error'))), LIBRARY_TIMEOUT);
@@ -447,7 +452,8 @@ export default class MaPlayer extends Generic<MaPlayerRxData, MaPlayerState> {
         const answer = this.props.context.socket.sendTo(this.getNamespace(), 'getMedia', {
             list,
             search,
-            limit: 200,
+            offset,
+            limit,
         }) as Promise<LibraryAnswer>;
         return Promise.race([answer, timeout]).finally(() => clearTimeout(timer));
     };
@@ -657,6 +663,7 @@ export default class MaPlayer extends Generic<MaPlayerRxData, MaPlayerState> {
             <LibraryDialog
                 load={this.loadLibrary}
                 t={key => MaPlayer.t(key)}
+                storageKey={`${this.getNamespace()}.library`}
                 onPick={uri => {
                     this.set(player, 'playMedia', uri);
                     this.setState({ libraryOpen: false });

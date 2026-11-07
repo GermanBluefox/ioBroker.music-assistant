@@ -1,4 +1,7 @@
 {
+    "madm_albums": "专辑",
+    "madm_artists": "艺术家",
+    "madm_audiobooks": "有声书",
     "madm_back": "返回",
     "madm_close": "关闭",
     "madm_favorites": "收藏",
@@ -6,6 +9,7 @@
     "madm_instance": "Music Assistant 实例",
     "madm_library": "媒体库",
     "madm_library_error": "无法读取媒体库",
+    "madm_load_more": "加载更多",
     "madm_mute": "静音",
     "madm_name": "名称",
     "madm_next": "下一首",
@@ -18,6 +22,7 @@
     "madm_player": "Music Assistant 播放器",
     "madm_player_select": "播放器",
     "madm_playlists": "播放列表",
+    "madm_podcasts": "播客",
     "madm_power_on": "打开",
     "madm_previous": "上一首",
     "madm_radio": "电台",
@@ -34,5 +39,6 @@
     "madm_shuffle": "随机播放",
     "madm_source": "音源",
     "madm_switched_off": "已关闭",
+    "madm_tracks": "曲目",
     "madm_unmute": "取消静音"
 }

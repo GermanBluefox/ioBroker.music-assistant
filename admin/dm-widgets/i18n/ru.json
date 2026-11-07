@@ -1,4 +1,7 @@
 {
+    "madm_albums": "Альбомы",
+    "madm_artists": "Исполнители",
+    "madm_audiobooks": "Аудиокниги",
     "madm_back": "Назад",
     "madm_close": "Закрыть",
     "madm_favorites": "Избранное",
@@ -6,6 +9,7 @@
     "madm_instance": "Экземпляр Music Assistant",
     "madm_library": "Библиотека",
     "madm_library_error": "Не удаётся прочитать библиотеку",
+    "madm_load_more": "Загрузить ещё",
     "madm_mute": "Выключить звук",
     "madm_name": "Название",
     "madm_next": "Следующий трек",
@@ -18,6 +22,7 @@
     "madm_player": "Плеер Music Assistant",
     "madm_player_select": "Плеер",
     "madm_playlists": "Плейлисты",
+    "madm_podcasts": "Подкасты",
     "madm_power_on": "Включить",
     "madm_previous": "Предыдущий трек",
     "madm_radio": "Радио",
@@ -34,5 +39,6 @@
     "madm_shuffle": "Перемешать",
     "madm_source": "Источник",
     "madm_switched_off": "Выключен",
+    "madm_tracks": "Треки",
     "madm_unmute": "Включить звук"
 }

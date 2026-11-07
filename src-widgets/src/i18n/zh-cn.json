@@ -1,4 +1,7 @@
 {
+    "albums": "专辑",
+    "artists": "艺术家",
+    "audiobooks": "有声书",
     "close": "关闭",
     "default_player": "初始播放器",
     "default_player_tooltip": "打开视图时显示的播放器。留空：第一个。",
@@ -8,6 +11,7 @@
     "instance": "实例",
     "library": "媒体库",
     "library_error": "无法读取媒体库",
+    "load_more": "加载更多",
     "mute": "静音",
     "name": "名称",
     "next": "下一首",
@@ -20,6 +24,7 @@
     "play": "播放",
     "player": "Music Assistant 播放器",
     "playlists": "播放列表",
+    "podcasts": "播客",
     "power_on": "打开",
     "previous": "上一首",
     "radio": "电台",
@@ -37,6 +42,7 @@
     "shuffle": "随机播放",
     "source": "音源",
     "switched_off": "已关闭",
+    "tracks": "曲目",
     "unmute": "取消静音",
     "without_card": "无卡片"
 }

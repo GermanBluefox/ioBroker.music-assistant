@@ -7,7 +7,7 @@
  *
  * The element reads and writes the states of the player channel `music-assistant.<n>.players.<id>` only - the
  * instance comes from the ID of the setting. Buttons are written with `true`, levels with their value; the adapter
- * sends the command to Music Assistant and acknowledges the state. The library (favorites, playlists, radio) comes
+ * sends the command to Music Assistant and acknowledges the state. The library (favorites, albums, radio, ...) comes
  * from the message `getMedia` of the instance; a picked entry is written into `playMedia`.
  *
  * React is not in the module: it comes from `lib/esm/react-19.js` beside `adapter/`, see `vite.config.ts`.
@@ -105,13 +105,13 @@ class MusicAssistantPlayer extends IobWebComponent<PlayerSettings> {
         shadow.append(style, mount);
         const root = createRoot(mount);
 
-        const load = (list: LibraryList, search: string): Promise<LibraryAnswer> => {
+        const load = (list: LibraryList, search: string, offset: number, limit: number): Promise<LibraryAnswer> => {
             let timer: ReturnType<typeof setTimeout> | undefined;
             const timeout = new Promise<LibraryAnswer>((_resolve, reject) => {
                 timer = setTimeout(() => reject(new Error(word('libraryError'))), LIBRARY_TIMEOUT);
             });
             return Promise.race([
-                socket.sendTo<LibraryAnswer>(instance, 'getMedia', { list, search, limit: 200 }),
+                socket.sendTo<LibraryAnswer>(instance, 'getMedia', { list, search, offset, limit }),
                 timeout,
             ]).finally(() => clearTimeout(timer));
         };
@@ -119,6 +119,7 @@ class MusicAssistantPlayer extends IobWebComponent<PlayerSettings> {
             <LibraryView
                 load={load}
                 word={word}
+                storageKey={`${instance}.library`}
                 onPick={uri =>
                     element.dispatchEvent(
                         new CustomEvent('iob-dialog-close', { bubbles: true, composed: true, detail: uri }),

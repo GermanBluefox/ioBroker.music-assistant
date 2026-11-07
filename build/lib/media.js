@@ -19,13 +19,34 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var media_exports = {};
 __export(media_exports, {
   FAVORITE_TYPES: () => FAVORITE_TYPES,
+  MEDIA_LISTS: () => MEDIA_LISTS,
   imageUrl: () => imageUrl,
   libraryCommand: () => libraryCommand,
+  listType: () => listType,
   normalizeBaseUrl: () => normalizeBaseUrl,
   parseMediaRequest: () => parseMediaRequest,
   toMediaEntry: () => toMediaEntry
 });
 module.exports = __toCommonJS(media_exports);
+const MEDIA_LISTS = [
+  "favorites",
+  "artists",
+  "albums",
+  "tracks",
+  "playlists",
+  "radios",
+  "podcasts",
+  "audiobooks"
+];
+const LIST_TYPE = {
+  artists: "artist",
+  albums: "album",
+  tracks: "track",
+  playlists: "playlist",
+  radios: "radio",
+  podcasts: "podcast",
+  audiobooks: "audiobook"
+};
 const LIBRARY_BASE = {
   playlist: "playlists",
   radio: "radios",
@@ -42,11 +63,14 @@ const THUMB_SIZE = 160;
 function libraryCommand(type) {
   return `music/${LIBRARY_BASE[type] || `${type}s`}/library_items`;
 }
+function listType(list) {
+  return list === "favorites" ? void 0 : LIST_TYPE[list];
+}
 function parseMediaRequest(message) {
   const msg = message && typeof message === "object" ? message : {};
   const list = msg.list;
-  if (list !== "favorites" && list !== "playlists" && list !== "radios") {
-    return `Unknown list "${String(list)}", use "favorites", "playlists" or "radios"`;
+  if (!MEDIA_LISTS.includes(list)) {
+    return `Unknown list "${String(msg.list)}", use one of ${MEDIA_LISTS.join(", ")}`;
   }
   const search = typeof msg.search === "string" ? msg.search.trim() : "";
   const limit = Math.min(MAX_LIMIT, Math.max(1, Math.round(Number(msg.limit) || DEFAULT_LIMIT)));
@@ -70,13 +94,15 @@ function imageUrl(image, baseUrl) {
   return "";
 }
 function toMediaEntry(item, baseUrl) {
-  var _a;
+  var _a, _b;
   if (!(item == null ? void 0 : item.uri)) {
     return null;
   }
   const images = ((_a = item.metadata) == null ? void 0 : _a.images) || [];
   const image = item.image || images.find((i) => (i == null ? void 0 : i.type) === "thumb") || images[0];
-  const subtitle = (item.artists || []).map((a) => a == null ? void 0 : a.name).filter(Boolean).join(", ") || item.owner || item.publisher || (item.authors || []).join(", ") || "";
+  const artists = (item.artists || []).map((a) => a == null ? void 0 : a.name).filter(Boolean).join(", ");
+  const byArtists = [artists, item.media_type === "track" ? (_b = item.album) == null ? void 0 : _b.name : ""].filter(Boolean).join(" \xB7 ");
+  const subtitle = byArtists || item.owner || item.publisher || (item.authors || []).join(", ") || "";
   return {
     uri: item.uri,
     name: item.name || item.uri,
@@ -92,8 +118,10 @@ function normalizeBaseUrl(baseUrl, fallback) {
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   FAVORITE_TYPES,
+  MEDIA_LISTS,
   imageUrl,
   libraryCommand,
+  listType,
   normalizeBaseUrl,
   parseMediaRequest,
   toMediaEntry

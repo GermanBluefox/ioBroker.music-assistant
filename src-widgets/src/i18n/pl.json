@@ -1,4 +1,7 @@
 {
+    "albums": "Albumy",
+    "artists": "Wykonawcy",
+    "audiobooks": "Audiobooki",
     "close": "Zamknij",
     "default_player": "Odtwarzacz startowy",
     "default_player_tooltip": "Odtwarzacz pokazywany po otwarciu widoku. Puste: pierwszy.",
@@ -8,6 +11,7 @@
     "instance": "Instancja",
     "library": "Biblioteka",
     "library_error": "Nie można odczytać biblioteki",
+    "load_more": "Wczytaj więcej",
     "mute": "Wycisz",
     "name": "Nazwa",
     "next": "Następny utwór",
@@ -20,6 +24,7 @@
     "play": "Odtwarzaj",
     "player": "Odtwarzacz Music Assistant",
     "playlists": "Playlisty",
+    "podcasts": "Podcasty",
     "power_on": "Włącz",
     "previous": "Poprzedni utwór",
     "radio": "Radio",
@@ -37,6 +42,7 @@
     "shuffle": "Losowo",
     "source": "Źródło",
     "switched_off": "Wyłączony",
+    "tracks": "Utwory",
     "unmute": "Włącz dźwięk",
     "without_card": "Bez karty"
 }

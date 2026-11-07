@@ -1,4 +1,7 @@
 {
+    "albums": "Álbuns",
+    "artists": "Artistas",
+    "audiobooks": "Audiolivros",
     "close": "Fechar",
     "default_player": "Leitor inicial",
     "default_player_tooltip": "Leitor mostrado ao abrir a vista. Vazio: o primeiro.",
@@ -8,6 +11,7 @@
     "instance": "Instância",
     "library": "Biblioteca",
     "library_error": "Não é possível ler a biblioteca",
+    "load_more": "Carregar mais",
     "mute": "Silenciar",
     "name": "Nome",
     "next": "Próxima faixa",
@@ -20,6 +24,7 @@
     "play": "Reproduzir",
     "player": "Leitor Music Assistant",
     "playlists": "Playlists",
+    "podcasts": "Podcasts",
     "power_on": "Ligar",
     "previous": "Faixa anterior",
     "radio": "Rádio",
@@ -37,6 +42,7 @@
     "shuffle": "Aleatório",
     "source": "Fonte",
     "switched_off": "Desligado",
+    "tracks": "Faixas",
     "unmute": "Ativar som",
     "without_card": "Sem cartão"
 }

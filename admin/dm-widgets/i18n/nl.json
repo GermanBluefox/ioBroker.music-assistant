@@ -1,4 +1,7 @@
 {
+    "madm_albums": "Albums",
+    "madm_artists": "Artiesten",
+    "madm_audiobooks": "Luisterboeken",
     "madm_back": "Terug",
     "madm_close": "Sluiten",
     "madm_favorites": "Favorieten",
@@ -6,6 +9,7 @@
     "madm_instance": "Music Assistant-instantie",
     "madm_library": "Bibliotheek",
     "madm_library_error": "De bibliotheek kan niet worden gelezen",
+    "madm_load_more": "Meer laden",
     "madm_mute": "Dempen",
     "madm_name": "Naam",
     "madm_next": "Volgend nummer",
@@ -18,6 +22,7 @@
     "madm_player": "Music Assistant-speler",
     "madm_player_select": "Speler",
     "madm_playlists": "Afspeellijsten",
+    "madm_podcasts": "Podcasts",
     "madm_power_on": "Inschakelen",
     "madm_previous": "Vorig nummer",
     "madm_radio": "Radio",
@@ -34,5 +39,6 @@
     "madm_shuffle": "Shuffle",
     "madm_source": "Bron",
     "madm_switched_off": "Uitgeschakeld",
+    "madm_tracks": "Nummers",
     "madm_unmute": "Dempen opheffen"
 }

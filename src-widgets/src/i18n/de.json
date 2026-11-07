@@ -1,4 +1,7 @@
 {
+    "albums": "Alben",
+    "artists": "Künstler",
+    "audiobooks": "Hörbücher",
     "close": "Schließen",
     "default_player": "Start-Player",
     "default_player_tooltip": "Player, der beim Öffnen der View gezeigt wird. Leer: der erste.",
@@ -8,6 +11,7 @@
     "instance": "Instanz",
     "library": "Bibliothek",
     "library_error": "Die Bibliothek kann nicht gelesen werden",
+    "load_more": "Mehr laden",
     "mute": "Stumm",
     "name": "Name",
     "next": "Nächster Titel",
@@ -20,6 +24,7 @@
     "play": "Abspielen",
     "player": "Music-Assistant-Player",
     "playlists": "Playlists",
+    "podcasts": "Podcasts",
     "power_on": "Einschalten",
     "previous": "Vorheriger Titel",
     "radio": "Radio",
@@ -37,6 +42,7 @@
     "shuffle": "Zufallswiedergabe",
     "source": "Quelle",
     "switched_off": "Ausgeschaltet",
+    "tracks": "Titel",
     "unmute": "Ton an",
     "without_card": "Ohne Karte"
 }

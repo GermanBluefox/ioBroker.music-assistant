@@ -1,4 +1,7 @@
 {
+    "albums": "Albums",
+    "artists": "Artists",
+    "audiobooks": "Audiobooks",
     "close": "Close",
     "default_player": "Start player",
     "default_player_tooltip": "Player that is shown when the view opens. Empty: the first one.",
@@ -8,6 +11,7 @@
     "instance": "Instance",
     "library": "Library",
     "library_error": "The library cannot be read",
+    "load_more": "Load more",
     "mute": "Mute",
     "name": "Name",
     "next": "Next track",
@@ -20,6 +24,7 @@
     "play": "Play",
     "player": "Music Assistant player",
     "playlists": "Playlists",
+    "podcasts": "Podcasts",
     "power_on": "Switch on",
     "previous": "Previous track",
     "radio": "Radio",
@@ -37,6 +42,7 @@
     "shuffle": "Shuffle",
     "source": "Source",
     "switched_off": "Switched off",
+    "tracks": "Tracks",
     "unmute": "Unmute",
     "without_card": "Without card"
 }

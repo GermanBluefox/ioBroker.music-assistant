@@ -1,4 +1,7 @@
 {
+    "madm_albums": "Álbumes",
+    "madm_artists": "Artistas",
+    "madm_audiobooks": "Audiolibros",
     "madm_back": "Atrás",
     "madm_close": "Cerrar",
     "madm_favorites": "Favoritos",
@@ -6,6 +9,7 @@
     "madm_instance": "Instancia de Music Assistant",
     "madm_library": "Biblioteca",
     "madm_library_error": "No se puede leer la biblioteca",
+    "madm_load_more": "Cargar más",
     "madm_mute": "Silenciar",
     "madm_name": "Nombre",
     "madm_next": "Pista siguiente",
@@ -18,6 +22,7 @@
     "madm_player": "Reproductor de Music Assistant",
     "madm_player_select": "Reproductor",
     "madm_playlists": "Listas",
+    "madm_podcasts": "Pódcasts",
     "madm_power_on": "Encender",
     "madm_previous": "Pista anterior",
     "madm_radio": "Radio",
@@ -34,5 +39,6 @@
     "madm_shuffle": "Aleatorio",
     "madm_source": "Fuente",
     "madm_switched_off": "Apagado",
+    "madm_tracks": "Canciones",
     "madm_unmute": "Activar sonido"
 }

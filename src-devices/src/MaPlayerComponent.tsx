@@ -574,14 +574,19 @@ export class MaPlayerComponent extends WidgetGeneric<MaPlayerComponentState, MaP
     private closePlayer = (): void => this.setState({ playerOpen: false, libraryOpen: false });
 
     /** Asks the instance for a list of the library, see `getMedia` in src/main.ts */
-    private loadLibrary = (list: LibraryList, search: string): Promise<LibraryAnswer> => {
+    private loadLibrary = (
+        list: LibraryList,
+        search: string,
+        offset: number,
+        limit: number,
+    ): Promise<LibraryAnswer> => {
         let timer: ReturnType<typeof setTimeout> | undefined;
         const timeout = new Promise<LibraryAnswer>((_resolve, reject) => {
             timer = setTimeout(() => reject(new Error(I18n.t('madm_library_error'))), LIBRARY_TIMEOUT);
         });
         const answer = this.props.stateContext
             .getSocket()
-            .sendTo<LibraryAnswer>(this.instance, 'getMedia', { list, search, limit: 200 });
+            .sendTo<LibraryAnswer>(this.instance, 'getMedia', { list, search, offset, limit });
         return Promise.race([answer, timeout]).finally(() => clearTimeout(timer));
     };
 
@@ -1351,6 +1356,7 @@ export class MaPlayerComponent extends WidgetGeneric<MaPlayerComponentState, MaP
                         <LibraryPanel
                             load={this.loadLibrary}
                             t={translate}
+                            storageKey={`${this.instance}.library`}
                             accent={this.accent}
                             onPick={this.onLibraryPick}
                         />

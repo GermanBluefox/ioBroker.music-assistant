@@ -1,4 +1,7 @@
 {
+    "madm_albums": "Альбоми",
+    "madm_artists": "Виконавці",
+    "madm_audiobooks": "Аудіокниги",
     "madm_back": "Назад",
     "madm_close": "Закрити",
     "madm_favorites": "Обране",
@@ -6,6 +9,7 @@
     "madm_instance": "Екземпляр Music Assistant",
     "madm_library": "Бібліотека",
     "madm_library_error": "Не вдається прочитати бібліотеку",
+    "madm_load_more": "Завантажити ще",
     "madm_mute": "Вимкнути звук",
     "madm_name": "Назва",
     "madm_next": "Наступний трек",
@@ -18,6 +22,7 @@
     "madm_player": "Плеєр Music Assistant",
     "madm_player_select": "Плеєр",
     "madm_playlists": "Плейлисти",
+    "madm_podcasts": "Подкасти",
     "madm_power_on": "Увімкнути",
     "madm_previous": "Попередній трек",
     "madm_radio": "Радіо",
@@ -34,5 +39,6 @@
     "madm_shuffle": "Перемішати",
     "madm_source": "Джерело",
     "madm_switched_off": "Вимкнено",
+    "madm_tracks": "Треки",
     "madm_unmute": "Увімкнути звук"
 }

@@ -1,11 +1,11 @@
 import { expect } from 'chai';
 
-import { imageUrl, libraryCommand, normalizeBaseUrl, parseMediaRequest, toMediaEntry } from './media';
+import { imageUrl, libraryCommand, listType, normalizeBaseUrl, parseMediaRequest, toMediaEntry } from './media';
 
 const BASE = 'http://192.168.1.10:8095';
 
 describe('parseMediaRequest', () => {
-    it('takes the three lists with limits in range', () => {
+    it('takes a list with limits in range', () => {
         expect(parseMediaRequest({ list: 'playlists' })).to.deep.equal({ list: 'playlists', limit: 100, offset: 0 });
         expect(parseMediaRequest({ list: 'radios', search: ' swr ', limit: 9999, offset: -5 })).to.deep.equal({
             list: 'radios',
@@ -15,14 +15,22 @@ describe('parseMediaRequest', () => {
         });
     });
 
+    it('takes every media type of the library', () => {
+        for (const list of ['favorites', 'artists', 'albums', 'tracks', 'podcasts', 'audiobooks']) {
+            expect(parseMediaRequest({ list })).to.have.property('list', list);
+        }
+    });
+
     it('refuses an unknown list', () => {
-        expect(parseMediaRequest({ list: 'albums' })).to.be.a('string');
+        expect(parseMediaRequest({ list: 'genres' })).to.be.a('string');
         expect(parseMediaRequest(null)).to.be.a('string');
     });
 });
 
 describe('libraryCommand', () => {
-    it('names the command of a media type', () => {
+    it('names the command of a media type, the favorites have none', () => {
+        expect(listType('favorites')).to.equal(undefined);
+        expect(libraryCommand(listType('audiobooks')!)).to.equal('music/audiobooks/library_items');
         expect(libraryCommand('radio')).to.equal('music/radios/library_items');
         expect(libraryCommand('playlist')).to.equal('music/playlists/library_items');
     });
@@ -71,6 +79,21 @@ describe('toMediaEntry', () => {
             image: `${BASE}/imageproxy/id7?size=160`,
             type: 'album',
         });
+    });
+
+    it('adds the album to the artists of a track', () => {
+        expect(
+            toMediaEntry(
+                {
+                    uri: 'library://track/9',
+                    name: 'Bohemian Rhapsody',
+                    media_type: 'track',
+                    artists: [{ name: 'Queen' }],
+                    album: { name: 'A Night at the Opera' },
+                },
+                BASE,
+            )?.subtitle,
+        ).to.equal('Queen · A Night at the Opera');
     });
 
     it('takes the owner of a playlist and skips an item without URI', () => {

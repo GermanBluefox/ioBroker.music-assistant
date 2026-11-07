@@ -153,9 +153,12 @@ It replaces what the player's queue is playing now.
 
 ### Pick from the library: message `getMedia`
 
-The players of the web component and both widgets have a library button: favorites, playlists and radio stations
-of Music Assistant with a search. They ask the adapter with the message `getMedia` and write the URI of the picked
-entry into `playMedia`. Scripts can use it too:
+The players of the web component and both widgets have a library button: the favorites, artists, albums, tracks,
+playlists, radio stations, podcasts and audiobooks of Music Assistant with a search, 100 entries at a time with a
+button to load more. They ask the adapter with the message `getMedia` and write the URI of the picked entry into
+`playMedia` - an artist, an album or a playlist plays as a whole. The library opens where the user left it: the
+same list, search and scroll position, with as many entries loaded as before (remembered per instance in the local
+storage of the browser). Scripts can use it too:
 
 ```js
 sendTo('music-assistant.0', 'getMedia', { list: 'radios', search: 'swr', limit: 50 }, answer => {
@@ -164,8 +167,10 @@ sendTo('music-assistant.0', 'getMedia', { list: 'radios', search: 'swr', limit: 
 });
 ```
 
-`list` is `favorites`, `playlists` or `radios`; `search`, `limit` (1-500, default 100) and `offset` are optional.
-Favorites are those of the Music Assistant user the adapter signs in with. `image` is a thumbnail from the image
+`list` is `favorites`, `artists`, `albums`, `tracks`, `playlists`, `radios`, `podcasts` or `audiobooks`; `search`,
+`limit` (1-500, default 100) and `offset` are optional. The lists are sorted by name. `favorites` are the favorite
+items of all these types of the Music Assistant user the adapter signs in with. `subtitle` is the artist (and the
+album of a track), the owner of a playlist or the publisher and authors of a podcast or audiobook. `image` is a thumbnail from the image
 proxy of Music Assistant, at the address the server reports (its `base_url`), so the browser has to reach it.
 
 A player that is deleted in Music Assistant is removed in ioBroker as well (also when it was deleted
@@ -192,7 +197,8 @@ One widget for all players of an instance: the players are chips on top - a clic
 one shows a play icon. Below them the cover, title and artist, the position with a slider to jump within the track,
 previous/play-pause/next, shuffle, repeat, mute and the volume. A player that is off gets a power button. A player
 with native sources (Spotify Connect, AirPlay, ...) shows the active one after the title, as a list to switch it.
-The library button after the title opens favorites, playlists and radio stations of Music Assistant to play.
+The library button after the title opens the library of Music Assistant (favorites, artists, albums, tracks,
+playlists, radio, podcasts, audiobooks) to play.
 
 | Setting                        | Description                                                         |
 |--------------------------------|---------------------------------------------------------------------|
@@ -211,7 +217,8 @@ The library button after the title opens favorites, playlists and radio stations
 The tile shows the cover with title, artist and the position; a click on it opens the whole player as a dialog -
 cover, position slider, transport, shuffle, repeat, mute and volume, and below the name of the player the list of
 its sources, if it has native ones (Spotify Connect, AirPlay, ...). The library button in the top right corner of
-the dialog switches it to favorites, playlists and radio stations of Music Assistant. The tile follows the size set in the dashboard:
+the dialog switches it to the library of Music Assistant (favorites, artists, albums, tracks, playlists, radio,
+podcasts, audiobooks). The tile follows the size set in the dashboard:
 1x1 is the cover with the texts on it, 2x0.5 a row with a small cover on a blurred one, 2x1 and 2x2 the large cover
 with the texts below.
 
@@ -231,8 +238,9 @@ every ioBroker UI with support for `@iobroker/web-components` shows alike - vis-
 admin. It shows the cover, the title, the artist and the album, the position (also of a stream that has no end),
 play/pause, previous/next, shuffle, repeat, mute and the volume, and a power button for a player that is off.
 If the player has native sources (Spotify Connect, AirPlay, ...), the active one is shown after the name of the
-player as a list to switch the source. The library button at the end of that line opens favorites, playlists and
-radio stations of Music Assistant in a dialog; a click plays the entry on the player.
+player as a list to switch the source. The library button at the end of that line opens the library of Music
+Assistant in a dialog - favorites, artists, albums, tracks, playlists, radio, podcasts and audiobooks with a search;
+a click plays the entry on the player.
 
 | Setting                   | Description                                                                         |
 |---------------------------|-------------------------------------------------------------------------------------|
@@ -290,7 +298,7 @@ start/stop the instance manually from the Admin UI instead.
 * (@GermanBluefox) Added native player widgets for vis-2 and for the dashboard of devices, built like the SONOS widgets. They have the name of the web component, so vis-2 and devices show only the native one
 * (@GermanBluefox) Added the message `getPlayers`, which lists the players of the instance
 * (@GermanBluefox) Added the writable state `source` (`media.input`) to switch the source of a player, and the source selection in the web component and both widgets
-* (@GermanBluefox) Added the message `getMedia` (favorites, playlists and radio stations of Music Assistant) and a library in the web component and both widgets to play from them
+* (@GermanBluefox) Added the message `getMedia` (favorites, artists, albums, tracks, playlists, radio stations, podcasts and audiobooks of Music Assistant) and a library in the web component and both widgets to play from them
 
 ### 0.1.0 (2026-11-03)
 * (@GermanBluefox) Added the tab "Players" to the instance settings to see and control the players

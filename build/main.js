@@ -710,7 +710,7 @@ class MusicAssistant extends utils.Adapter {
     }
   }
   /**
-   * Favorites, playlists or radio stations of the library of Music Assistant, for the message `getMedia`.
+   * The favorites or the library items of one media type of Music Assistant, for the message `getMedia`.
    * Favorites are those of the user the adapter signs in with.
    *
    * @param request what the UI asked for
@@ -723,10 +723,11 @@ class MusicAssistant extends utils.Adapter {
     }
     const search = request.search ? { search: request.search } : {};
     let items;
-    if (request.list === "favorites") {
+    const type = (0, import_media.listType)(request.list);
+    if (!type) {
       const lists = await Promise.allSettled(
         import_media.FAVORITE_TYPES.map(
-          (type) => client.sendCommand((0, import_media.libraryCommand)(type), {
+          (type2) => client.sendCommand((0, import_media.libraryCommand)(type2), {
             favorite: true,
             limit: request.offset + request.limit,
             order_by: "sort_name",
@@ -740,10 +741,12 @@ class MusicAssistant extends utils.Adapter {
       }
       items = found.flatMap((l) => Array.isArray(l.value) ? l.value : []).slice(request.offset, request.offset + request.limit);
     } else {
-      const result = await client.sendCommand(
-        (0, import_media.libraryCommand)(request.list === "playlists" ? "playlist" : "radio"),
-        { limit: request.limit, offset: request.offset, order_by: "sort_name", ...search }
-      );
+      const result = await client.sendCommand((0, import_media.libraryCommand)(type), {
+        limit: request.limit,
+        offset: request.offset,
+        order_by: "sort_name",
+        ...search
+      });
       items = Array.isArray(result) ? result : [];
     }
     return items.map((item) => (0, import_media.toMediaEntry)(item, this.maBaseUrl)).filter((e) => !!e);
