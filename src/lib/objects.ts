@@ -38,6 +38,14 @@ export const PLAYER_STATES: Record<string, ioBroker.StateCommon> = {
         write: false,
         states: { 0: 'pause', 1: 'play', 2: 'stop' },
     },
+    playing: {
+        name: 'Playing',
+        desc: 'true while playing. Writing true plays, false pauses - for widgets that expect a boolean play/pause state',
+        type: 'boolean',
+        role: 'switch',
+        read: true,
+        write: true,
+    },
     playbackState: { name: 'Playback state (raw)', type: 'string', role: 'text', read: true, write: false },
     volume: {
         name: 'Volume',
@@ -108,11 +116,11 @@ export const QUEUE_STATES: Record<string, ioBroker.StateCommon> = {
     shuffleEnabled: { name: 'Shuffle', type: 'boolean', role: 'media.mode.shuffle', read: true, write: true },
     repeatMode: {
         name: 'Repeat mode',
-        type: 'string',
+        type: 'number',
         role: 'media.mode.repeat',
         read: true,
         write: true,
-        states: { off: 'off', one: 'one', all: 'all' },
+        states: { 0: 'off', 1: 'all', 2: 'one' },
     },
     elapsedTime: { name: 'Elapsed time', type: 'number', role: 'media.elapsed', unit: 's', read: true, write: false },
     currentItemName: { name: 'Current item', type: 'string', role: 'media.title', read: true, write: false },

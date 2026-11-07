@@ -1,7 +1,7 @@
 {
     "name": "iobroker.music-assistant-widgets",
     "private": true,
-    "version": "0.1.0",
+    "version": "0.2.1",
     "type": "module",
     "dependencies": {
         "@iobroker/types-vis-2": "~2.20.8",

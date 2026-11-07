@@ -114,6 +114,7 @@ For every Music Assistant player, the adapter creates the channel `music-assista
 | State                                                                         | Description                                                        |
 |-------------------------------------------------------------------------------|--------------------------------------------------------------------|
 | `state`                                                                       | `0` = pause, `1` = play, `2` = stop (role `media.state`)           |
+| `playing`                                                                     | `true` while playing; writing `true` plays, `false` pauses (for widgets that expect a boolean) |
 | `playbackState`                                                               | Raw state of Music Assistant: `idle`, `paused`, `playing`          |
 | `available`, `powered`, `name`, `activeSource`, `queueId`                     | Player status (`powered` is writable)                              |
 | `source`                                                                      | Writable source (`media.input`), see below                         |
@@ -181,7 +182,7 @@ For every player queue, `music-assistant.0.queues.<queue_id>` gets:
 | State                                                                 | Description              |
 |-----------------------------------------------------------------------|--------------------------|
 | `state`, `displayName`, `available`, `currentItemName`, `elapsedTime` | Queue status             |
-| `shuffleEnabled`, `repeatMode`                                        | Writable queue settings  |
+| `shuffleEnabled`, `repeatMode`                                        | Writable queue settings (`repeatMode`: 0 = off, 1 = all, 2 = one) |
 | `control.play` / `pause` / `playPause` / `stop` / `next` / `previous` | Writable control buttons |
 
 ## Widgets for vis-2 and devices
@@ -297,11 +298,17 @@ start/stop the instance manually from the Admin UI instead.
     ### **WORK IN PROGRESS**
 -->
 ### **WORK IN PROGRESS**
+* (@GermanBluefox) Added the writable state `source` (`media.input`) to switch the source of a player, and the source selection in the web component and both widgets
+* (@GermanBluefox) Added the message `getMedia` (favorites, artists, albums, tracks, playlists, radio stations, podcasts and audiobooks of Music Assistant) and a library in the web component and both widgets to play from them
+
+### 0.2.1 (2026-11-07)
+* (@M1kad0) Changed `queues.<id>.repeatMode` from a string (`off`/`one`/`all`) to a number (0 = off, 1 = all, 2 = one), like `players.<id>.repeat`, so that it matches the type of the role `media.mode.repeat`
+
+### 0.2.0 (2026-11-05)
 * (@GermanBluefox) Added the web component `<iob-ma-player>` for vis-2, devices and the other UIs that show web components (`common.webComponents`)
 * (@GermanBluefox) Added native player widgets for vis-2 and for the dashboard of devices, built like the SONOS widgets. They have the name of the web component, so vis-2 and devices show only the native one
 * (@GermanBluefox) Added the message `getPlayers`, which lists the players of the instance
-* (@GermanBluefox) Added the writable state `source` (`media.input`) to switch the source of a player, and the source selection in the web component and both widgets
-* (@GermanBluefox) Added the message `getMedia` (favorites, artists, albums, tracks, playlists, radio stations, podcasts and audiobooks of Music Assistant) and a library in the web component and both widgets to play from them
+* (@M1kad0) Added the boolean state `players.<id>.playing` (writable: `true` plays, `false` pauses) for widgets that expect a boolean play/pause state, e.g. the player of vis-2-widgets-material
 
 ### 0.1.0 (2026-11-03)
 * (@GermanBluefox) Added the tab "Players" to the instance settings to see and control the players

@@ -67,7 +67,7 @@ interface UsedResourcesApi {
 /**
  * ioBroker object ids may only contain a limited character set.
  *
- * @param id
+ * @param id the raw id from Music Assistant
  */
 function sanitizeId(id: string): string {
     return id.replace(/[^a-zA-Z0-9_-]/g, '_');
@@ -509,6 +509,7 @@ class MusicAssistant extends utils.Adapter {
             available: !!player.available,
             powered: !!player.powered,
             state: MEDIA_STATE[player.playback_state] ?? MEDIA_STATE.unknown,
+            playing: player.playback_state === 'playing',
             playbackState: player.playback_state,
             volume: player.volume_level ?? 0,
             muted: !!player.volume_muted,
@@ -580,7 +581,7 @@ class MusicAssistant extends utils.Adapter {
             available: !!queue.available,
             state: queue.state,
             shuffleEnabled: !!queue.shuffle_enabled,
-            repeatMode: queue.repeat_mode,
+            repeatMode: REPEAT_TO_NUMBER[queue.repeat_mode] ?? REPEAT_TO_NUMBER.off,
             elapsedTime: queue.elapsed_time ?? 0,
             currentItemName: queue.current_item?.name ?? '',
         };
@@ -685,6 +686,11 @@ class MusicAssistant extends utils.Adapter {
             case 'powered':
                 await this.client.sendCommand('players/cmd/power', { player_id: playerId, powered: !!state.val });
                 return 'refresh';
+            case 'playing':
+                await this.client.sendCommand(state.val ? 'players/cmd/play' : 'players/cmd/pause', {
+                    player_id: playerId,
+                });
+                return 'refresh';
             case 'volume':
                 await this.client.sendCommand('players/cmd/volume_set', {
                     player_id: playerId,
@@ -780,7 +786,11 @@ class MusicAssistant extends utils.Adapter {
             return 'refresh';
         }
         if (path[0] === 'repeatMode') {
-            await this.client.sendCommand('player_queues/repeat', { queue_id: queueId, repeat_mode: state.val });
+            const mode = NUMBER_TO_REPEAT[Number(state.val)];
+            if (!mode) {
+                throw new Error(`Unknown repeat mode ${String(state.val)}, use 0 (off), 1 (all) or 2 (one)`);
+            }
+            await this.client.sendCommand('player_queues/repeat', { queue_id: queueId, repeat_mode: mode });
             return 'refresh';
         }
         return 'none';
