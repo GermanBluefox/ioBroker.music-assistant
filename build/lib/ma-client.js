@@ -74,6 +74,12 @@ class MaClient extends import_node_events.EventEmitter {
   reconnectTimer = void 0;
   closing = false;
   authenticated = false;
+  /**
+   * @param host host name or IP address of the Music Assistant server
+   * @param port port of the Music Assistant server
+   * @param auth how the client signs in
+   * @param scheduler timer functions of the adapter
+   */
   constructor(host, port, auth, scheduler) {
     super();
     this.url = `ws://${host}:${port}/ws`;
@@ -313,8 +319,8 @@ class MaClient extends import_node_events.EventEmitter {
   /**
    * Send a command and resolve with its result once the server responds.
    *
-   * @param command
-   * @param args
+   * @param command the command of the server API, e.g. `player_queues/play`
+   * @param args the arguments of the command
    */
   sendCommand(command, args) {
     if (!this.ws || this.ws.readyState !== import_ws.default.OPEN) {

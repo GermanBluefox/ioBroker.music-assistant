@@ -55,7 +55,7 @@ interface UsedResourcesApi {
 /**
  * ioBroker object ids may only contain a limited character set.
  *
- * @param id
+ * @param id the raw id from Music Assistant
  */
 function sanitizeId(id: string): string {
     return id.replace(/[^a-zA-Z0-9_-]/g, '_');

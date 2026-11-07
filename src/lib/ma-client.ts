@@ -1,9 +1,13 @@
 import { EventEmitter } from 'node:events';
 import WebSocket from 'ws';
 
+/** An event pushed by the Music Assistant server */
 export interface MaEvent {
+    /** Name of the event, e.g. `player_updated` */
     event: string;
+    /** Id of the object the event is about */
     object_id: string;
+    /** The object or the details of the event */
     data?: unknown;
 }
 
@@ -55,7 +59,9 @@ const DEVICE_NAME = 'ioBroker.music-assistant';
 
 /** Timer scheduling, routed through the adapter so pending timers get cleared automatically on unload. */
 export interface MaClientScheduler {
+    /** Starts a timer that calls `callback` after `ms` milliseconds */
     setTimeout: (callback: () => void, ms: number) => ioBroker.Timeout | undefined;
+    /** Stops a timer that was started with `setTimeout` */
     clearTimeout: (timer: ioBroker.Timeout | undefined) => void;
 }
 
@@ -112,6 +118,12 @@ export class MaClient extends EventEmitter {
     private closing = false;
     private authenticated = false;
 
+    /**
+     * @param host host name or IP address of the Music Assistant server
+     * @param port port of the Music Assistant server
+     * @param auth how the client signs in
+     * @param scheduler timer functions of the adapter
+     */
     public constructor(host: string, port: number, auth: MaClientAuth, scheduler: MaClientScheduler) {
         super();
         this.url = `ws://${host}:${port}/ws`;
@@ -383,8 +395,8 @@ export class MaClient extends EventEmitter {
     /**
      * Send a command and resolve with its result once the server responds.
      *
-     * @param command
-     * @param args
+     * @param command the command of the server API, e.g. `player_queues/play`
+     * @param args the arguments of the command
      */
     public sendCommand<T = unknown>(command: string, args?: Record<string, unknown>): Promise<T> {
         if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
