@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "music-assistant",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "news": {
+      "0.2.1": {
+        "en": "Changed `queues.<id>.repeatMode` from a string (`off`/`one`/`all`) to a number (0 = off, 1 = all, 2 = one), like `players.<id>.repeat`, so that it matches the type of the role `media.mode.repeat`",
+        "de": "Queues geändert. <id>.repeatMode` von einer Zahl (`off`/`one`/`all`) zu einer Zahl (0 = aus, 1 = alle, 2 = eins), wie `players. <id>.repeat`, sodass es zum Typ der Rolle `media.mode.repeat` passt",
+        "ru": "Изменены «очереди». <id>.repeatMode` из строки (`off`/`one`/`all`) в число (0 = выключено, 1 = все, 2 = единица), например `игроки. <id>.repeat`, чтобы оно соответствовало типу роли `media.mode.repeat`",
+        "pt": "Filas alteradas. <id>.repeatMode` de uma string (`off`/`all`) a um número (0 = off, 1 = all, 2 = one), como `players. <id>.repeat`, para que corresponda ao tipo de função `media.mode.repeat`",
+        "nl": "„Wachtrijen” gewijzigd. <id>.RepeatMode` van een tekenreeks (`off`/`one`/`all`) naar een getal (0 = uit, 1 = alles, 2 = één), zoals `players. <id>.repeat`, zodat het overeenkomt met het type van de rol `media.mode.repeat`",
+        "fr": "Queues modifiées. <id>.repeatMode` d'une chaîne (`off`/`one`/`all`) à un chiffre (0 = off, 1 = all, 2 = un), comme `players. <id>.repeat`, afin qu'il corresponde au type de rôle `media.mode.repeat`",
+        "it": "«Code» cambiate. <id>.RepeatMode da una stringa (off`/`uno`/`all`) a un numero (0 = off, 1 = all, 2 = one), come `players. <id>.repeat, in modo che corrisponda al tipo di ruolo «media.mode.repeat»",
+        "es": "Cambió las «colas». <id>.RepeatMode` de una cadena (`off`/`uno`/`all`) a un número (0 = off, 1 = todo, 2 = uno), como `jugadores. <id>.repeat`, para que coincida con el tipo de rol `media.mode.repeat`",
+        "pl": "Zmieniono kolejki. <id>.repeatMode` od ciągu (`off`/`one`/`all`) do liczby (0 = wyłączone, 1 = wszystkie, 2 = jeden), jak `gracze. <id>.repeat`, tak aby pasował do typu roli `media.mode.repeat`",
+        "uk": "Змінено `черги. <id>.RepeatMode` з рядка (`off`/`one`/`all`) до числа (0 = вимкнено, 1 = всі, 2 = один), як `плеєри. <id>.repeat, щоб він відповідав типу ролі `media.mode.repe`",
+        "zh-cn": "更改了 “队列”。<id>.repeatMode` 从一个字符串（`off`/`one`/`all`）到一个数字（0 = 关闭，1 = 全部，2 = 一），比如 “玩家”。<id>.repeat，使其与 media.mode.repeat 角色的类型相匹配"
+      },
       "0.2.0": {
         "en": "Added the web component `<iob-ma-player>` for vis-2, devices and the other UIs that show web components (`common.webComponents`)\nAdded native player widgets for vis-2 and for the dashboard of devices, built like the SONOS widgets. They have the name of the web component, so vis-2 and devices show only the native one\nAdded the message `getPlayers`, which lists the players of the instance\nAdded the boolean state `players.<id>.playing` (writable: `true` plays, `false` pauses) for widgets that expect a boolean play/pause state, e.g. the player of vis-2-widgets-material",
         "de": "Webkomponente `<iob-ma-player>` für Vis-2, Geräte und andere UIs mit Webkomponenten hinzugefügt (`common.WebComponents`)\nNative Player-Widgets für Vis-2 und für das Geräte-Dashboard hinzugefügt, wie SONOS. Sie haben den Namen der Webkomponente, also vis-2 und Geräte zeigen nur die native\nMeldung `getPlayers` hinzugefügt, die die Spieler der Instanz auflistet\nBoolean `players hinzugefügt. <id>.playing (schreibbar: „true“ plays, `false` Pausen) für Widgets, die einen booleschen Play/Pause-Status erwarten, z. B.",

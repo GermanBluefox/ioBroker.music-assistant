@@ -109,11 +109,11 @@ const QUEUE_STATES = {
   shuffleEnabled: { name: "Shuffle", type: "boolean", role: "media.mode.shuffle", read: true, write: true },
   repeatMode: {
     name: "Repeat mode",
-    type: "string",
+    type: "number",
     role: "media.mode.repeat",
     read: true,
     write: true,
-    states: { off: "off", one: "one", all: "all" }
+    states: { 0: "off", 1: "all", 2: "one" }
   },
   elapsedTime: { name: "Elapsed time", type: "number", role: "media.elapsed", unit: "s", read: true, write: false },
   currentItemName: { name: "Current item", type: "string", role: "media.title", read: true, write: false }

@@ -435,7 +435,7 @@ class MusicAssistant extends utils.Adapter {
     await this.writeChannelObjects(`queues.${safeId}`, name, void 0, import_objects.QUEUE_STATES, import_objects.QUEUE_BUTTONS, "control");
   }
   async applyQueue(queue) {
-    var _a, _b, _c, _d;
+    var _a, _b, _c, _d, _e;
     const safeId = sanitizeId(queue.queue_id);
     this.queueIds.set(safeId, queue.queue_id);
     await this.ensureQueueObjects(safeId, queue.display_name);
@@ -446,9 +446,9 @@ class MusicAssistant extends utils.Adapter {
       available: !!queue.available,
       state: queue.state,
       shuffleEnabled: !!queue.shuffle_enabled,
-      repeatMode: queue.repeat_mode,
-      elapsedTime: (_a = queue.elapsed_time) != null ? _a : 0,
-      currentItemName: (_c = (_b = queue.current_item) == null ? void 0 : _b.name) != null ? _c : ""
+      repeatMode: (_a = import_objects.REPEAT_TO_NUMBER[queue.repeat_mode]) != null ? _a : import_objects.REPEAT_TO_NUMBER.off,
+      elapsedTime: (_b = queue.elapsed_time) != null ? _b : 0,
+      currentItemName: (_d = (_c = queue.current_item) == null ? void 0 : _c.name) != null ? _d : ""
     };
     for (const [key, val] of Object.entries(values)) {
       await this.setStateChangedAsync(`${base}.${key}`, val, true);
@@ -457,7 +457,7 @@ class MusicAssistant extends utils.Adapter {
       await this.setStateChangedAsync(`players.${safeId}.shuffle`, !!queue.shuffle_enabled, true);
       await this.setStateChangedAsync(
         `players.${safeId}.repeat`,
-        (_d = import_objects.REPEAT_TO_NUMBER[queue.repeat_mode]) != null ? _d : import_objects.REPEAT_TO_NUMBER.off,
+        (_e = import_objects.REPEAT_TO_NUMBER[queue.repeat_mode]) != null ? _e : import_objects.REPEAT_TO_NUMBER.off,
         true
       );
     }
@@ -619,7 +619,11 @@ class MusicAssistant extends utils.Adapter {
       return "refresh";
     }
     if (path[0] === "repeatMode") {
-      await this.client.sendCommand("player_queues/repeat", { queue_id: queueId, repeat_mode: state.val });
+      const mode = import_objects.NUMBER_TO_REPEAT[Number(state.val)];
+      if (!mode) {
+        throw new Error(`Unknown repeat mode ${String(state.val)}, use 0 (off), 1 (all) or 2 (one)`);
+      }
+      await this.client.sendCommand("player_queues/repeat", { queue_id: queueId, repeat_mode: mode });
       return "refresh";
     }
     return "none";
