@@ -14,7 +14,6 @@
     "Long-lived token from Settings → Profile on the Music Assistant server": "Token di lunga durata da Impostazioni → Profilo sul server Music Assistant",
     "media_folders_info": "Cartelle dell’host ioBroker montate nel container, ad es. la libreria musicale o una condivisione NAS montata sull’host. Formato: /percorso/sull/host:/percorso/nel/container, con :ro alla fine per l’accesso in sola lettura. In Music Assistant aggiungere il provider musicale \"Local files\" con il percorso nel container, ad es. /media/music.",
     "Music Assistant server host/IP": "Host/IP del server Music Assistant",
-    "music-assistant adapter settings": "Impostazioni dell'adattatore per music-assistant",
     "Password": "Password",
     "Players": "Lettori",
     "Port": "Porta",
