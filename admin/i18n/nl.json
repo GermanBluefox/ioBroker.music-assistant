@@ -14,7 +14,6 @@
     "Long-lived token from Settings → Profile on the Music Assistant server": "Token met lange levensduur van Instellingen → Profiel op de Music Assistant-server",
     "media_folders_info": "Mappen van de ioBroker-host die in de container worden gekoppeld, bijv. de muziekbibliotheek of een op de host gekoppelde NAS-share. Formaat: /pad/op/host:/pad/in/container, met :ro aan het einde voor alleen-lezen toegang. Voeg in Music Assistant de muziekprovider \"Local files\" toe met het pad in de container, bijv. /media/music.",
     "Music Assistant server host/IP": "Music Assistant-serverhost/IP",
-    "music-assistant adapter settings": "Adapterinstellingen voor music-assistant",
     "Password": "Wachtwoord",
     "Players": "Spelers",
     "Port": "Poort",

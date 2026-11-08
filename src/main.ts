@@ -3,6 +3,7 @@
  */
 import * as utils from '@iobroker/adapter-core';
 
+import { SafeIdRegistry } from './lib/ids';
 import { MaAuthError, MaClient, type MaEvent } from './lib/ma-client';
 import type { Player, PlayerQueue, SearchResults } from './lib/ma-types';
 import {
@@ -64,17 +65,10 @@ interface UsedResourcesApi {
     supportsFeature?: (feature: string) => boolean;
 }
 
-/**
- * ioBroker object ids may only contain a limited character set.
- *
- * @param id the raw id from Music Assistant
- */
-function sanitizeId(id: string): string {
-    return id.replace(/[^a-zA-Z0-9_-]/g, '_');
-}
-
 class MusicAssistant extends utils.Adapter {
     private client: MaClient | null = null;
+    /** Ids of the player and queue channels, unique even if Music Assistant ids only differ in their case */
+    private readonly safeIds = new SafeIdRegistry();
     private readonly playerIds = new Map<string, string>(); // sanitized -> raw player_id
     private readonly queueIds = new Map<string, string>(); // sanitized -> raw queue_id
     private readonly knownPlayerObjects = new Set<string>();
@@ -225,6 +219,14 @@ class MusicAssistant extends utils.Adapter {
                     en: 'Web interface of Music Assistant running in Docker',
                     de: 'Weboberfläche des in Docker laufenden Music Assistant',
                     ru: 'Веб-интерфейс Music Assistant, работающего в Docker',
+                    pt: 'Interface web do Music Assistant em execução no Docker',
+                    nl: 'Webinterface van Music Assistant dat in Docker draait',
+                    fr: 'Interface web de Music Assistant exécuté dans Docker',
+                    it: 'Interfaccia web di Music Assistant in esecuzione in Docker',
+                    es: 'Interfaz web de Music Assistant que se ejecuta en Docker',
+                    pl: 'Interfejs WWW Music Assistant działającego w Dockerze',
+                    uk: 'Веб-інтерфейс Music Assistant, що працює в Docker',
+                    'zh-cn': '在 Docker 中运行的 Music Assistant 的 Web 界面',
                 },
                 color: '#03A9F4',
                 intro: true,
@@ -335,10 +337,10 @@ class MusicAssistant extends utils.Adapter {
             this.log.debug(`Cannot read the player configurations, no clean-up: ${(err as Error).message}`);
             return;
         }
-        const keep = new Set([...players, ...configs].map(p => sanitizeId(p.player_id)));
+        const keep = new Set([...players, ...configs].map(p => this.safeIds.get(p.player_id)));
         await this.removeStaleChannels('players', keep);
         for (const queue of queues) {
-            keep.add(sanitizeId(queue.queue_id));
+            keep.add(this.safeIds.get(queue.queue_id));
         }
         await this.removeStaleChannels('queues', keep);
     }
@@ -399,10 +401,11 @@ class MusicAssistant extends utils.Adapter {
                 break;
             case 'player_removed': {
                 // a player is only reported as removed when it is deleted for good; its queue goes with it
-                const safeId = sanitizeId(evt.object_id);
+                const safeId = this.safeIds.get(evt.object_id);
                 this.log.info(`Player ${evt.object_id} was removed from Music Assistant`);
                 await this.removeChannel('players', safeId);
                 await this.removeChannel('queues', safeId);
+                this.safeIds.release(evt.object_id);
                 break;
             }
             case 'queue_added':
@@ -410,7 +413,7 @@ class MusicAssistant extends utils.Adapter {
                 await this.applyQueue(evt.data as PlayerQueue);
                 break;
             case 'queue_time_updated': {
-                const safeId = sanitizeId(evt.object_id);
+                const safeId = this.safeIds.get(evt.object_id);
                 const data = evt.data as { elapsed_time?: number } | undefined;
                 if (data && typeof data.elapsed_time === 'number') {
                     if (this.queueIds.has(safeId)) {
@@ -494,7 +497,7 @@ class MusicAssistant extends utils.Adapter {
     }
 
     private async applyPlayer(player: Player): Promise<void> {
-        const safeId = sanitizeId(player.player_id);
+        const safeId = this.safeIds.get(player.player_id);
         this.playerIds.set(safeId, player.player_id);
         this.playerNames.set(player.player_id, player.name);
         await this.ensurePlayerObjects(safeId, player.name);
@@ -570,7 +573,7 @@ class MusicAssistant extends utils.Adapter {
     }
 
     private async applyQueue(queue: PlayerQueue): Promise<void> {
-        const safeId = sanitizeId(queue.queue_id);
+        const safeId = this.safeIds.get(queue.queue_id);
         this.queueIds.set(safeId, queue.queue_id);
         await this.ensureQueueObjects(safeId, queue.display_name);
 

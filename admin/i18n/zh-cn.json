@@ -14,7 +14,6 @@
     "Long-lived token from Settings → Profile on the Music Assistant server": "音乐助手服务器上的“设置”→“配置文件”中的长期令牌",
     "media_folders_info": "挂载到容器中的 ioBroker 主机文件夹，例如音乐库或挂载在主机上的 NAS 共享。格式：/主机/路径:/容器/路径，末尾加 :ro 表示只读访问。在 Music Assistant 中添加音乐提供程序 \"Local files\"，并填写容器中的路径，例如 /media/music。",
     "Music Assistant server host/IP": "音乐助手服务器主机/IP",
-    "music-assistant adapter settings": "music-assistant的适配器设置",
     "Password": "密码",
     "Players": "播放器",
     "Port": "端口",

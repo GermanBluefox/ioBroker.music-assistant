@@ -301,6 +301,10 @@ start/stop the instance manually from the Admin UI instead.
 ### **WORK IN PROGRESS**
 * (@GermanBluefox) Added the writable state `source` (`media.input`) to switch the source of a player, and the source selection in the web component and both widgets
 * (@GermanBluefox) Added the message `getMedia` (favorites, artists, albums, tracks, playlists, radio stations, podcasts and audiobooks of Music Assistant) and a library in the web component and both widgets to play from them
+* (@M1kad0) Fixed player and queue channels sharing or colliding in their object id when Music Assistant ids differ only in case or in replaced characters
+* (@M1kad0) Raised the required admin version to 8.0.0, which the custom component of the settings needs
+* (@M1kad0) Translated the description of the Music Assistant web interface link into all languages
+* (@M1kad0) Removed an unused translation key from the admin translations
 
 ### 0.2.1 (2026-11-07)
 * (@M1kad0) Changed `queues.<id>.repeatMode` from a string (`off`/`one`/`all`) to a number (0 = off, 1 = all, 2 = one), like `players.<id>.repeat`, so that it matches the type of the role `media.mode.repeat`

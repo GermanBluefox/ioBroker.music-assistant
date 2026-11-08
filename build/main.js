@@ -22,6 +22,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   mod
 ));
 var utils = __toESM(require("@iobroker/adapter-core"));
+var import_ids = require("./lib/ids");
 var import_ma_client = require("./lib/ma-client");
 var import_objects = require("./lib/objects");
 var import_media = require("./lib/media");
@@ -32,11 +33,10 @@ const MIN_PASSWORD_LENGTH = 8;
 const MEDIA_FOLDER_SETTINGS = ["mediaFolder1", "mediaFolder2", "mediaFolder3"];
 const MEDIA_FOLDER_RE = /^\/[^:]+:\/(?!data(?:[/:]|$))[^:]+(?::(?:ro|rw))?$/;
 const USED_RESOURCES_FEATURE = "CONTROLLER_USED_RESOURCES";
-function sanitizeId(id) {
-  return id.replace(/[^a-zA-Z0-9_-]/g, "_");
-}
 class MusicAssistant extends utils.Adapter {
   client = null;
+  /** Ids of the player and queue channels, unique even if Music Assistant ids only differ in their case */
+  safeIds = new import_ids.SafeIdRegistry();
   playerIds = /* @__PURE__ */ new Map();
   // sanitized -> raw player_id
   queueIds = /* @__PURE__ */ new Map();
@@ -167,7 +167,15 @@ class MusicAssistant extends utils.Adapter {
         description: {
           en: "Web interface of Music Assistant running in Docker",
           de: "Weboberfl\xE4che des in Docker laufenden Music Assistant",
-          ru: "\u0412\u0435\u0431-\u0438\u043D\u0442\u0435\u0440\u0444\u0435\u0439\u0441 Music Assistant, \u0440\u0430\u0431\u043E\u0442\u0430\u044E\u0449\u0435\u0433\u043E \u0432 Docker"
+          ru: "\u0412\u0435\u0431-\u0438\u043D\u0442\u0435\u0440\u0444\u0435\u0439\u0441 Music Assistant, \u0440\u0430\u0431\u043E\u0442\u0430\u044E\u0449\u0435\u0433\u043E \u0432 Docker",
+          pt: "Interface web do Music Assistant em execu\xE7\xE3o no Docker",
+          nl: "Webinterface van Music Assistant dat in Docker draait",
+          fr: "Interface web de Music Assistant ex\xE9cut\xE9 dans Docker",
+          it: "Interfaccia web di Music Assistant in esecuzione in Docker",
+          es: "Interfaz web de Music Assistant que se ejecuta en Docker",
+          pl: "Interfejs WWW Music Assistant dzia\u0142aj\u0105cego w Dockerze",
+          uk: "\u0412\u0435\u0431-\u0456\u043D\u0442\u0435\u0440\u0444\u0435\u0439\u0441 Music Assistant, \u0449\u043E \u043F\u0440\u0430\u0446\u044E\u0454 \u0432 Docker",
+          "zh-cn": "\u5728 Docker \u4E2D\u8FD0\u884C\u7684 Music Assistant \u7684 Web \u754C\u9762"
         },
         color: "#03A9F4",
         intro: true
@@ -273,10 +281,10 @@ class MusicAssistant extends utils.Adapter {
       this.log.debug(`Cannot read the player configurations, no clean-up: ${err.message}`);
       return;
     }
-    const keep = new Set([...players, ...configs].map((p) => sanitizeId(p.player_id)));
+    const keep = new Set([...players, ...configs].map((p) => this.safeIds.get(p.player_id)));
     await this.removeStaleChannels("players", keep);
     for (const queue of queues) {
-      keep.add(sanitizeId(queue.queue_id));
+      keep.add(this.safeIds.get(queue.queue_id));
     }
     await this.removeStaleChannels("queues", keep);
   }
@@ -333,10 +341,11 @@ class MusicAssistant extends utils.Adapter {
         await this.applyPlayer(evt.data);
         break;
       case "player_removed": {
-        const safeId = sanitizeId(evt.object_id);
+        const safeId = this.safeIds.get(evt.object_id);
         this.log.info(`Player ${evt.object_id} was removed from Music Assistant`);
         await this.removeChannel("players", safeId);
         await this.removeChannel("queues", safeId);
+        this.safeIds.release(evt.object_id);
         break;
       }
       case "queue_added":
@@ -344,7 +353,7 @@ class MusicAssistant extends utils.Adapter {
         await this.applyQueue(evt.data);
         break;
       case "queue_time_updated": {
-        const safeId = sanitizeId(evt.object_id);
+        const safeId = this.safeIds.get(evt.object_id);
         const data = evt.data;
         if (data && typeof data.elapsed_time === "number") {
           if (this.queueIds.has(safeId)) {
@@ -412,7 +421,7 @@ class MusicAssistant extends utils.Adapter {
   }
   async applyPlayer(player) {
     var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
-    const safeId = sanitizeId(player.player_id);
+    const safeId = this.safeIds.get(player.player_id);
     this.playerIds.set(safeId, player.player_id);
     this.playerNames.set(player.player_id, player.name);
     await this.ensurePlayerObjects(safeId, player.name);
@@ -483,7 +492,7 @@ class MusicAssistant extends utils.Adapter {
   }
   async applyQueue(queue) {
     var _a, _b, _c, _d, _e;
-    const safeId = sanitizeId(queue.queue_id);
+    const safeId = this.safeIds.get(queue.queue_id);
     this.queueIds.set(safeId, queue.queue_id);
     await this.ensureQueueObjects(safeId, queue.display_name);
     const base = `queues.${safeId}`;

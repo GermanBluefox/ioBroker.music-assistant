@@ -14,7 +14,6 @@
     "Long-lived token from Settings → Profile on the Music Assistant server": "Langlebiges Token aus Einstellungen → Profil auf dem Music Assistant-Server",
     "media_folders_info": "Ordner des ioBroker-Hosts, die in den Container eingebunden werden, z. B. die Musiksammlung oder eine auf dem Host eingehängte NAS-Freigabe. Format: /pfad/auf/host:/pfad/im/container, mit :ro am Ende für Nur-Lese-Zugriff. In Music Assistant den Musikanbieter \"Local files\" mit dem Pfad im Container hinzufügen, z. B. /media/music.",
     "Music Assistant server host/IP": "Host/IP des Music Assistant-Servers",
-    "music-assistant adapter settings": "Adaptereinstellungen für music-assistant",
     "Password": "Passwort",
     "Players": "Player",
     "Port": "Port",
