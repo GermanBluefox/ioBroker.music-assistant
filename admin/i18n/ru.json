@@ -14,7 +14,6 @@
     "Long-lived token from Settings → Profile on the Music Assistant server": "Долговечный токен из «Настройки» → «Профиль» на сервере Music Assistant.",
     "media_folders_info": "Папки хоста ioBroker, которые монтируются в контейнер, например музыкальная библиотека или сетевой ресурс NAS, смонтированный на хосте. Формат: /путь/на/хосте:/путь/в/контейнере, с :ro в конце для доступа только на чтение. В Music Assistant добавьте музыкального провайдера \"Local files\" с путём в контейнере, например /media/music.",
     "Music Assistant server host/IP": "Хост/IP-адрес сервера Music Assistant",
-    "music-assistant adapter settings": "Настройки адаптера для music-assistant",
     "Password": "Пароль",
     "Players": "Плееры",
     "Port": "Порт",
