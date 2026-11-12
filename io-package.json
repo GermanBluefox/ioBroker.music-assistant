@@ -127,7 +127,28 @@
     },
     "messagebox": true,
     "webComponents": [
-      "webcomponents/ma-player.json"
+      {
+        "manifest": "webcomponents/ma-player.json",
+        "tag": "iob-ma-player",
+        "name": {
+          "en": "Music Assistant player",
+          "de": "Music-Assistant-Player",
+          "ru": "Плеер Music Assistant",
+          "pt": "Leitor Music Assistant",
+          "nl": "Music Assistant-speler",
+          "fr": "Lecteur Music Assistant",
+          "it": "Lettore Music Assistant",
+          "es": "Reproductor de Music Assistant",
+          "pl": "Odtwarzacz Music Assistant",
+          "uk": "Плеєр Music Assistant",
+          "zh-cn": "Music Assistant 播放器"
+        },
+        "icon": "../music-assistant.png",
+        "size": {
+          "width": 380,
+          "height": 190
+        }
+      }
     ],
     "visWidgets": {
       "vis2MusicAssistantWidgets": {

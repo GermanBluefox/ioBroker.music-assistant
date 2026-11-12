@@ -305,6 +305,7 @@ start/stop the instance manually from the Admin UI instead.
 * (@M1kad0) Raised the required admin version to 8.0.0, which the custom component of the settings needs
 * (@M1kad0) Translated the description of the Music Assistant web interface link into all languages
 * (@M1kad0) Removed an unused translation key from the admin translations
+* (@GermanBluefox) Added the short form of the web component manifests (tag, name, icon, size) to `common.webComponents`, so that hosts like Aura can list the components before the adapter is installed; the build writes it with `iob-web-components sync-io-package`
 
 ### 0.2.1 (2026-11-07)
 * (@M1kad0) Changed `queues.<id>.repeatMode` from a string (`off`/`one`/`all`) to a number (0 = off, 1 = all, 2 = one), like `players.<id>.repeat`, so that it matches the type of the role `media.mode.repeat`
